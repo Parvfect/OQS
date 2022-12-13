@@ -2,7 +2,7 @@
 
 
 """ Time Dependent solver for the SQUID model 
-wihtout matrix diff form, might need to iron out the constants first
+wihtout matrix diff form, might need to iron out the constants firsts
 """
 
 import numpy as np

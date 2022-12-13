@@ -1,14 +1,12 @@
 
-
-
 # Imports 
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import multi_dot
+from helper_functions import *
 
 
 # Defining Operators
-
 sz = np.array([[1,0],[0,-1]])
 wo = 10
 H = (wo/2) * sz 
@@ -21,52 +19,21 @@ def LinEm():
 L = LinEm()
 
 def handler(rho):
-    return np.dot(L, rho)
+    return np.dot(L, rho.flatten("F")).reshape(2,2).T
 
-# Integration Method
-def RK4step(x, h):
-    k1 = handler(x)
-    k2 = handler(x+h*k1/2)
-    k3 = handler(x+h*k2/2)
-    k4 = handler(x+h*k3)
-    return x+(h/6)*(k1+2*k2+2*k3+k4)
+if __name__ == '__main__':
+    # Simulating
+    init = np.array([[0.5,0.5],[0.5,0.5]], dtype=complex)
 
-# Simulating
+    t_i = 0
+    t_f = 20
+    nsteps = 500
 
-init = np.array([[0.5,0.5],[0.5,0.5]], dtype=complex)
+    h = (t_f-t_i)/nsteps
 
-t_i = 0
-t_f = 20
-nsteps = 500
-
-h = (t_f-t_i)/nsteps
-
-
-solRK = np.zeros((nsteps+1,2,2),dtype=complex)
-solRK[0]=init
-
-for step in range(1,solRK.shape[0]):
-
-    solRK[step] = RK4step(solRK[step-1].flatten("F"),h).reshape(2,2).T
-
-
-# Visualising
-
-import matplotlib
-matplotlib.rcParams.update({'font.size': 16,'font.family':'serif'})
-fig, ax = plt.subplots(figsize=(12, 9))
-
-trange = 0.1*np.linspace(t_i,t_f,nsteps+1)
-#plt.plot(trange,np.real(solRK[:,0,0]), label = r'$\rho_{11}$')
-plt.plot(trange,np.real(solRK[:,1,1]), label = r'$\rho_{22}$')
-plt.plot(trange,np.real(solRK[:,1,1]+solRK[:,0,0]), label = r'$\mathrm{Tr}[\rho]$')
-plt.plot(trange,np.real(solRK[:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
-plt.plot(trange,np.imag(solRK[:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
-
-plt.xlabel('$\gamma t$')
-plt.ylim(-0.5, 1.1)
-plt.legend(loc = "best",numpoints=1,frameon=True)
-plt.title("Free dynamics of two level atom")
-
-plt.show()
+    solRK = np.zeros((nsteps+1,2,2),dtype=complex)
+    solRK[0]=init
+    solRK = solver(solRK, handler, h)
+    # Visualising
+    plot_density_matrix_elements(solRK)
 

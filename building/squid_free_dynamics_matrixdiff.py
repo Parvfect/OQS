@@ -77,7 +77,7 @@ def RK4step(x, h):
     #k2 = handler(x+h*k1/2)
     #k3 = handler(x+h*k2/2)
     #k4 = handler(x+h*k3)
-    return h*k1#+(h/6)*(k1+2*k2+2*k3+k4)
+    return x*k1#+(h/6)*(k1+2*k2+2*k3+k4)
 
 for i in range(1,nsteps):
     rho = t[i-1]

@@ -58,6 +58,11 @@ for step in range(1,solRK.shape[0]):
     solRK[step] = RK4step(solRK[step-1].flatten("F"),h).reshape(2,2).T
 
 
+
+
+
+
+
 # Visualising
 
 import matplotlib
