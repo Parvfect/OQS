@@ -8,8 +8,8 @@ from helper_functions import *
 
 # Defining Operators
 sz = np.array([[1,0],[0,-1]])
-sp = np.array([[0,1],[0,0]])
-sm = np.array([[0,0],[1,0]])
+sp = create_creation_operator(2)
+sm = create_annihilation_operator(2)
 wo = 10
 H = (wo/2) * sz 
 gamma = 0.1
@@ -29,7 +29,7 @@ def handler(rho):
 
 if __name__ == "__main__":
     # Simulating
-    init = np.array([[0.5,0.5],[0.5,0.5]], dtype=complex)
+    init = make_initial_density_matrix(2)
 
     t_i = 0
     t_f = 30

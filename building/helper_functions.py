@@ -1,8 +1,15 @@
 
 """ General Functions utilised by the steady state and time dependent solvers """
+
 import numpy as np
 import matplotlib.pyplot as plt
+from sympy import Matrix
 
+def get_commutator(a,b):
+    return np.dot(a,b) - np.dot(b,a)
+
+def get_anti_commutator(a,b):
+    return np.dot(a,b) + np.dot(b,a)
 
 """ Operator creation functions """
 def create_annihilation_operator(n):
@@ -40,8 +47,9 @@ def create_cos_phi(n, phi, phi_o, phi_x):
     cos_phi_1 = (2*3.14/phi_o)*phi - 2*3.14*(phi_x/phi_o)*np.identity(n)
     return get_function_of_operator(lambda x: np.cos(x), phi)
 
+
 def make_initial_density_matrix(n):
-  return np.ones((n,n), dtype=complex)/n
+    return np.ones((n,n), dtype=complex)/n
 
 """ RK4 solver """
 
@@ -61,6 +69,10 @@ def solver(sol_arr, f, h):
 
     return sol_arr
 
+def steady_state_solver(L):
+    """ Solving AX = 0 for the steady state of the system, minimum solution"""
+    return Matrix(L).nullspace()[0]
+
 """ Plotting functions """
 
 def plot_density_matrix_elements(rho, title=""):
@@ -75,7 +87,7 @@ def plot_density_matrix_elements(rho, title=""):
     plt.plot(np.imag(rho[:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
 
     plt.xlabel('$\gamma t$')
-    plt.ylim(-0.5, 1.1)
+    #plt.ylim(-0.5, 1.1)
     plt.legend(loc="lower right", numpoints=1,frameon=True)
     plt.title("Density Matrix Dynamics {}".format(title))
 
