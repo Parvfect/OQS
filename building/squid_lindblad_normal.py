@@ -1,56 +1,52 @@
 
 
-
-""" Time Dependent solver for the SQUID model 
-wihtout matrix diff form, might need to iron out the constants firsts
-work with this and then extend to matrix diff and steady state solutions
-"""
+""" Time Dependent solver for the SQUID model """
 
 import numpy as np
 import matplotlib.pyplot as plt
 from helper_functions import *
 
 n = 3
+l=3e-10
+C=5e-15
+je = 9.9e-22
+hbar = 1e-34
+m = 9.1e-31
+w = 8.16e11
+
+
 adag = create_annihilation_operator(n) # Annihilation operator
 a = create_creation_operator(n) # Creation operator
 
-phi = 0.2 * (adag + a) # Flux operator (analogous to position operator)
-Q = 0.5 * (1j)* (adag - a) # Momentum operator
-cphi = 0.5*create_cos_phi(n, phi, 1, 1)
-L =  phi + (1j - 0.2) * Q # Lindblad operator
-Ldag = np.conj(L.T) # Conj transpose of Lindblad
+phi = (np.sqrt((hbar)/(2*m*w))*((adag + a))*1e-13)/(2*l) # Flux operator (analogous to position operator)
+Q = (np.sqrt((hbar*m*w)/(2)) * (1j)* (adag - a))/(2*C) # Momentum operator
+cphi = create_cos_phi(n, phi, 1, 1)
+print(cphi)
+#print(phi)
+#print(Q)
 
-L = np.array(L)
-
-H = np.dot(Q,Q) + np.dot(phi, phi) + cphi
+H = np.dot(Q,Q) + np.dot(phi, phi) + je*cphi
+H = H* 1e24
+print(H)
 H = np.array(H)
 init = make_initial_density_matrix(n)
-# Setting simulation parameters
-t_i = 0
-t_f = 500
-nsteps = 20000
-h = (t_f-t_i)/nsteps
-t = np.zeros((nsteps+1, n,n), dtype=complex)
-t[0] = init
 
-def first_order_equation():
-    """ First order equation for steady state """
-    hamiltonian_part = -1j* (np.dot(H, x) - np.dot(x, H)) 
-    lindblad_part = 0.5* (get_commutator(L, np.dot(x, Ldag)) + get_commutator(np.dot(L,x), Ldag))
-    
-    return hamiltonian_part + lindblad_part
 
 def handler(x):
-  return -1j* (np.dot(H, x) - np.dot(x, H))
+    return (-1j)* (np.dot(H, x) - np.dot(x, H))  
 
-def RK4step(x, h):
-    k1 = handler(x)
-    k2 = handler(x+h*k1/2)
-    k3 = handler(x+h*k2/2)
-    k4 = handler(x+h*k3)
-    return x+(h/6)*(k1+2*k2+2*k3+k4)
 
 if __name__ == "__main__":
+    # Setting simulation parameters
+    t_i = 0
+    t_f = 100
+    nsteps = 20000
+    h = (t_f-t_i)/nsteps
+    t = np.zeros((nsteps+1, n,n), dtype=complex)
+    t[0] = init
+
     t = solver(t, handler, h)
+
+    # Plotting
     plot_density_matrix_elements(t)
-    plot_trace_purity(t)
+    #plot_trace_purity(t)

@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
 
+pi = np.pi
+
 def get_commutator(a,b):
     return np.dot(a,b) - np.dot(b,a)
 
@@ -42,10 +44,17 @@ def get_function_of_operator(f, op):
     
     return result
 
-def create_cos_phi(n, phi, phi_o, phi_x):
-    """ Create a cos(phi) operator for the n-th mode """
-    cos_phi_1 = (2*3.14/phi_o)*phi - 2*3.14*(phi_x/phi_o)*np.identity(n)
-    return get_function_of_operator(lambda x: np.cos(x), phi)
+def create_cos_phi(phi, phi_o, phi_x, alpha): 
+    """
+    Create a cos(phi) operator for the n-th mode     
+    """
+    cos_const = np.cos((2*pi)*(phi_x/phi_o))
+    sin_const = np.sin((2*pi)*(phi_x/phi_o))
+    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*phi)
+    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
+    return cos_const*cos_phi - sin_const*sin_phi
+
+
 
 
 def make_initial_density_matrix(n):
