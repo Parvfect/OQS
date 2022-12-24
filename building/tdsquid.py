@@ -1,11 +1,10 @@
 
-# So we are trying to get an idea of what the potential well looks like
 
 from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 80
+n = 40
 
 # Constants
 pi = np.pi
@@ -13,6 +12,8 @@ C = 5e-15
 l = 3e-10
 je = 9e-22
 hbar = 1e-34
+gamma = 0.4
+cutoff = 20
 w = 8.16e11
 e = 1.6e-19
 phi_o = hbar/(2*e)
@@ -34,18 +35,24 @@ P = np.sqrt((1)/(C*w*hbar)) * Q
 cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi)
+L = gamma**(0.5) * (X + (1j - w/(2*cutoff))* P)
+Ldag = L.conj().T
+
+
+def first_order_equation():
+    """ First order equation for steady state """
+    hamiltonian_part = -(1j/hbar) * (np.kron(H, np.identity(n)) - np.kron(np.identity(n), H)) 
+    lindblad_part_1 = np.kron(Ldag, L) 
+    lindblad_part_2 = - 0.5*(np.kron(np.identity(n), np.dot(Ldag, L)) + np.kron(np.dot(Ldag, L), np.identity(n)))
+    return hamiltonian_part + lindblad_part_1 + lindblad_part_2
+
+L = first_order_equation()
 
 def handler(x):
-    return (-1j)* (np.dot(H, x) - np.dot(x, H))
+    return np.dot(L, x.reshape(n*n, 1)).reshape(n, n)
 
-# Get eigenvalues of the Hamiltonian
-eigenvalues, eigenvectors = np.linalg.eig(H)
 
-plt.plot(eigenvalues)
-plt.show()  
-"""
 if __name__ == "__main__":
-
     # Setting simulation parameters
     t_i = 0
     t_f = 100
@@ -58,5 +65,4 @@ if __name__ == "__main__":
 
     # Plotting
     plot_density_matrix_elements(t)
-    #plot_trace_purity(t)
-"""
+    plot_trace_purity(t)
