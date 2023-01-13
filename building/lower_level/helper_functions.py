@@ -54,9 +54,6 @@ def create_cos_phi(phi, phi_o, phi_x, alpha):
     sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
     return cos_const*cos_phi - sin_const*sin_phi
 
-
-
-
 def make_initial_density_matrix(n):
     return np.ones((n,n), dtype=complex)/n
 
