@@ -9,7 +9,7 @@ from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 20
+n = 40
 
 # Constants
 pi = np.pi
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 500
+    t_f = 200
     nsteps = 20000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)

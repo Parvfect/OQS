@@ -1,13 +1,6 @@
 
-
-"""
-convert to matrix diff form and see what the steady state looks like
-Dynamics are not too bad if one is assuming that the initial moment of coupling
-is within the simulation. Very interesting about the trace and purity though
-"""
-
+# Maybe try the normal one first aloha
 from helper_functions import *
-
 
 # Hilbert Space Dimensions
 n = 40
@@ -27,11 +20,11 @@ alpha = np.sqrt((4 * pi*pi * hbar)/(phi_o*phi_o*C))
 muomega = mu/w # 
 cutoff = 20 * w
 epsilon = w/cutoff # Cutoff frequency
-gamma = 0.1 # Damping Rate
+gamma = 0.05 # Damping Rate
 
 # Operators
-adag = create_annihilation_operator(n) # Annihilation operator
-a = create_creation_operator(n) # Creation operator
+a = create_annihilation_operator(n) # Annihilation operator
+adag = create_creation_operator(n) # Creation operator
 
 Q = (np.sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)) # Momentum operator
 phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to position operator)
@@ -45,28 +38,30 @@ H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
 L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
 Ldag = L.conj().T
 
-def LinEm()
 
-    lindblad_part = get_commutator(L)
+def first_order_equation():
+    """ First order equation for steady state """
+    hamiltonian_part = -(1j) * (np.kron(H, np.identity(n)) - np.kron(np.identity(n), H)) 
+    lindblad_part_1 = np.kron(Ldag, L) 
+    lindblad_part_2 = -0.5*(np.kron(np.identity(n), np.dot(Ldag, L)) + np.kron(np.dot(Ldag, L), np.identity(n)))
+    return hamiltonian_part + lindblad_part_1 + lindblad_part_2
+
+L = first_order_equation()
+
 def handler(x):
-    hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
-    lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
-    lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
-    return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2)
+    return np.dot(L, x.reshape(n*n, 1)).reshape(n, n)
 
 if __name__ == "__main__":
-
     # Setting simulation parameters
     t_i = 0
-    t_f = 500
+    t_f = 200
     nsteps = 20000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
-    """
+
     t = solver(t, handler, h)
 
     # Plotting
     plot_density_matrix_elements(t)
     plot_trace_purity(t)
-    """

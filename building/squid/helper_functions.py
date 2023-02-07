@@ -16,11 +16,11 @@ def get_anti_commutator(a,b):
 """ Operator creation functions """
 def create_annihilation_operator(n):
     """ Create an annihilation operator for the n-th mode """
-    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), -1), dtype=complex)
+    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
 
 def create_creation_operator(n):
     """ Create a creation operator for the n-th mode """
-    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
+    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), -1), dtype=complex)
 
 def get_function_of_operator(f, op):
     """ Return the function of the operator using Sylvester's formula """
@@ -87,8 +87,9 @@ def plot_density_matrix_elements(rho, title=""):
     fig, ax = plt.subplots(figsize=(12, 9))
 
     # Plotting density matrix elements - choose one off diagonal and one diagonal
-    plt.plot(np.real(rho[:,1,1]), label = r'$\rho_{22}$')
-    plt.plot(np.real(rho[:,1,1]+rho[:,0,0]), label = r'$\mathrm{Tr}[\rho]$')
+    plt.plot(np.real(rho[:,1,1]), label = r'$\rho_{11}$')
+    plt.plot(np.real(rho[:,2,3]), label = r'$\rho_{22}$')
+    plt.plot([np.trace(i) for i in rho], label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(np.real(rho[:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
     plt.plot(np.imag(rho[:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
 
