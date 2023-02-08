@@ -1,6 +1,6 @@
 
 % Hilbert Space Dimensions
-n = 10;
+n = 120;
 
 % Constants
 pi = 3.14;
@@ -32,14 +32,18 @@ P = sqrt((1)/(C*w*hbar)) * Q;
 %cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha);
 
 % Defining Hamiltonian and Lindbladian
-H =  (X.*X + P.*P + (hbar*gamma/2)*get_commutator(X, P));
+H =  (X.*X + P.*P + (gamma/2)*get_commutator(X, P));
 L = gamma^(0.5) * (X + (1j - epsilon/2) * P);
 Ldag = conj(L).';
 
+
 Lsup = first_order(H, L, Ldag, n);
+%disp(Lsup)
 rho  = steady_soln(Lsup);
+rho = rho(:,1);
 rho = reshape(rho, n, n);
-disp(trace(rho))
+image(abs(rho), 'CDataMapping','scaled')
+colorbar
 
 function result = first_order(H, L, Ldag, n)
     hamiltonian_part = -(1j) * (kron(H, eye(n)) - kron(eye(n), H));
