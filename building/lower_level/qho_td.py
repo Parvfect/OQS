@@ -2,33 +2,25 @@
 from helper_functions import *
 import numpy as np
 
-n = 4
+n = 20
 
-adag = create_annihilation_operator(n) # Annihilation operator
-a = create_creation_operator(n) # Creation operator
-
-hbar = 1e-34
-m = 9.1e-31
-w = 1e11
-l = 1
-C = 1
-je = 9e-22
-gamma = 0.005 * w # Relaxation Rate
-cutoff = 20
-e = 1.6e-19
-phi_o = hbar/2*e
-phi_x = 0.5*phi_o
+a = create_annihilation_operator(n)
+adag = create_creation_operator(n)
 gamma = 0.1
+hbar = 1e-34/2/np.pi
+m = 1e-27
+w = 1e12
 
-q = (adag + a)
-p =  (1j)* (adag - a)
-cphi = create_cos_phi(n, q, 1, 1)
+
+q = (adag + a)/2 # np.sqrt(hbar/m*w)*
+p = (1j)* (adag - a)/2 #  np.sqrt(hbar*m*w/2)*
+#cphi = create_cos_phi(n, q, 1, 1)
 
 Hp = np.dot(p,p)
 Hq = np.dot(q, q)
-Hcphi = cphi
+#Hcphi = cphi
 
-L = np.sqrt(2*gamma)*(adag)
+L = np.sqrt(2*gamma)*(a) 
 Ldag = np.matrix(L).H
 
 H = Hp + Hq# + Hcphi
@@ -44,14 +36,14 @@ init = make_initial_density_matrix(n)
 
 def handler(x):
     H_part = (-1j)* get_commutator(H, x)
-    L_part =  0.5 * (get_commutator(L, np.dot(x, Ldag)) + get_commutator(np.dot(L, x), Ldag))
+    L_part =  np.dot(L, np.dot(x, Ldag)) -0.5*(get_anti_commutator(np.dot(Ldag, L), x))
     return H_part + L_part
 
 
 if __name__ == "__main__":
     # Setting simulation parameters
     t_i = 0
-    t_f = 20
+    t_f = 1000
     nsteps = 2000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)

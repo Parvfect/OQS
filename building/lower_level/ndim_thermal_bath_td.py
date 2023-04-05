@@ -3,7 +3,7 @@ import numpy as np
 from helper_functions import *
 
 
-n = 5 # Hilbert Space Dimension
+n = 12 # Hilbert Space Dimension
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)

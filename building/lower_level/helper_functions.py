@@ -88,7 +88,7 @@ def plot_density_matrix_elements(rho, title=""):
 
     # Plotting density matrix elements - choose one off diagonal and one diagonal
     plt.plot(np.real(rho[:,1,1]), label = r'$\rho_{22}$')
-    plt.plot(np.real(rho[:,1,1]+rho[:,0,0]), label = r'$\mathrm{Tr}[\rho]$')
+    plt.plot([np.trace(i) for i in rho], label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(np.real(rho[:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
     plt.plot(np.imag(rho[:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
 
