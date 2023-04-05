@@ -6,17 +6,19 @@ Dynamics are not too bad if one is assuming that the initial moment of coupling
 is within the simulation. Very interesting about the trace and purity though
 """
 
+# Get this working and second order is trivial you just add a lindblad as a higher order contribution
+
 from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 40
+n = 5
 
 # Constants
 pi = np.pi
 C = 5e-15
 l = 3e-10
-je = 9e-22
+je = 9.99e-22
 hbar = 1e-34
 w = 8.16e11
 e = 1.6e-19
@@ -45,8 +47,7 @@ H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
 L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
 Ldag = L.conj().T
 
-def LinEm():
-    lindblad_part = get_commutator(L)
+
 def handler(x):
     hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
     lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     # Setting simulation parameters
     t_i = 0
     t_f = 500
-    nsteps = 20000
+    nsteps = 2000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
