@@ -65,8 +65,8 @@ def RK4step(x, h, f):
     k2 = f(x+h*k1/2)
     k3 = f(x+h*k2/2)
     k4 = f(x+h*k3)
-    return x+(h/6)*(k1+2*k2+2*k3+k4)
 
+    return x+(h/6)*(k1+2*k2+2*k3+k4)
 
 def solver(sol_arr, f, h):
 

@@ -3,7 +3,7 @@ import numpy as np
 from helper_functions import *
 
 
-n = 6 # Hilbert Space Dimension
+n = 4 # Hilbert Space Dimension
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)
@@ -12,7 +12,7 @@ a = create_creation_operator(n)
 # Hamiltonian
 q = (adag + a)/2
 p = 1j*(adag - a)/2
-H = 15*(np.dot(p,p) + np.dot(q,q))
+H = (np.dot(p,p) + np.dot(q,q))
 H = np.array(H)
 
 # Initial Density Matrix
@@ -21,7 +21,7 @@ w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
 T = 300
-gamma = 0.1
+gamma = 0.001
 #print(1/(np.exp((hbar*w)/(kb*T))-1))
 nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
 sz = np.array([[1,0],[0,-1]])
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     # Simulating
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 30
-    nsteps = 750
+    t_f = 2000
+    nsteps = 10000
 
     h = (t_f-t_i)/nsteps
 
