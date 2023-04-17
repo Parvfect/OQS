@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 200
+    t_f = 100
     nsteps = 20000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
@@ -66,5 +66,9 @@ if __name__ == "__main__":
 
     # Plotting
     plot_density_matrix_elements(t, title=f"{n} state SQUID TD simulation")
-    plot_trace_purity(t)
+    
+    #plot_trace_purity(t)
+
+    # Plotting the steady state
+    plot_steady_state_td(t, title=f"{n} state SQUID TD simulation steady state")
     

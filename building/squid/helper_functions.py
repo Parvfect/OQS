@@ -101,6 +101,12 @@ def plot_density_matrix_elements(rho, ti=0, title=""):
     plt.show()
 
 
+def plot_steady_state_td(rho, title=""):
+    steady_state = rho[-1]
+    plt.imshow(np.array(steady_state).astype(np.float64))
+    plt.title("Steady State Density Matrix {}".format(title))
+    plt.show()
+
 def get_trace(rho):
     trace = [np.trace(i) for i in rho]
     return trace
