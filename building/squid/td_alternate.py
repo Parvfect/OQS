@@ -48,7 +48,9 @@ def handler(x):
     hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
     lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
     lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
-    return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2)
+    lindblad_part_3 = get_commutator(Ldag, np.dot(x, L))
+    lindblad_part_4 = get_commutator(np.dot(Ldag, x), L)
+    return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2 + lindblad_part_3 + lindblad_part_4)
 
 if __name__ == "__main__":
 
@@ -63,6 +65,6 @@ if __name__ == "__main__":
     t = solver(t, handler, h)
 
     # Plotting
-    plot_density_matrix_elements(t)
+    plot_density_matrix_elements(t, title=f"{n} state SQUID TD simulation")
     plot_trace_purity(t)
     

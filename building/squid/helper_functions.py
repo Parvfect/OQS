@@ -16,11 +16,11 @@ def get_anti_commutator(a,b):
 """ Operator creation functions """
 def create_annihilation_operator(n):
     """ Create an annihilation operator for the n-th mode """
-    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
+    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), -1), dtype=complex)
 
 def create_creation_operator(n):
     """ Create a creation operator for the n-th mode """
-    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), -1), dtype=complex)
+    return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
 
 def get_function_of_operator(f, op):
     """ Return the function of the operator using Sylvester's formula """
@@ -65,8 +65,8 @@ def RK4step(x, h, f):
     k2 = f(x+h*k1/2)
     k3 = f(x+h*k2/2)
     k4 = f(x+h*k3)
-    return x+(h/6)*(k1+2*k2+2*k3+k4)
 
+    return x+(h/6)*(k1+2*k2+2*k3+k4)
 
 def solver(sol_arr, f, h):
 
@@ -81,18 +81,18 @@ def steady_state_solver(L):
 
 """ Plotting functions """
 
-def plot_density_matrix_elements(rho, title=""):
+def plot_density_matrix_elements(rho, ti=0, title=""):
     """ Plot the density matrix elements """
 
     fig, ax = plt.subplots(figsize=(12, 9))
 
     # Plotting density matrix elements - choose one off diagonal and one diagonal
-    plt.plot(np.real(rho[:,1,1]), label = r'$\rho_{11}$')
-    plt.plot(np.real(rho[:,2,3]), label = r'$\rho_{22}$')
-    plt.plot([np.trace(i) for i in rho], label = r'$\mathrm{Tr}[\rho]$')
-    plt.plot(np.real(rho[:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
-    plt.plot(np.imag(rho[:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
-
+    plt.plot(np.real(rho[ti:,1,1]), label = r'$\rho_{22}$')
+    plt.plot([np.trace(i) for i in rho[ti:,:,:]], label = r'$\mathrm{Tr}[\rho]$')
+    plt.plot(np.real(rho[ti:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
+    plt.plot(np.imag(rho[ti:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
+    purity = get_purity(rho[ti:,:,:])
+    plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
     plt.xlabel('$\gamma t$')
     #plt.ylim(-0.5, 1.1)
     plt.legend(loc="lower right", numpoints=1,frameon=True)
@@ -100,12 +100,21 @@ def plot_density_matrix_elements(rho, title=""):
 
     plt.show()
 
+
+def get_trace(rho):
+    trace = [np.trace(i) for i in rho]
+    return trace
+
+def get_purity(rho):    
+    purity = [np.trace(np.dot(i,i)) for i in rho]
+    return purity
+
 def plot_trace_purity(rho, title=""):
     """ Plot the trace and purity of the density matrix """
 
     # Calculating trace and purity
-    trace = [np.trace(i) for i in rho]
-    purity = [np.trace(np.dot(i,i)) for i in rho]
+    trace = get_trace(rho)
+    purity = get_purity(rho)
     
     # Plotting
     plt.plot(trace, label = r'$\mathrm{Tr}[\rho]$')

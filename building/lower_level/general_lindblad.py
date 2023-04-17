@@ -3,7 +3,7 @@ import numpy as np
 from helper_functions import *
 
 
-n = 4 # Hilbert Space Dimension
+n = 5 # Hilbert Space Dimension
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)
@@ -26,6 +26,7 @@ gamma = 0.001
 nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
 sz = np.array([[1,0],[0,-1]])
 wo = 10
+print(nth)
 #H = (wo/2) * sz 
 
 # Encoding Equation
