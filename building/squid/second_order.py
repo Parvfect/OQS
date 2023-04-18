@@ -1,4 +1,5 @@
 
+
 """
 convert to matrix diff form and see what the steady state looks like
 Dynamics are not too bad if one is assuming that the initial moment of coupling
@@ -28,6 +29,10 @@ cutoff = 20 * w
 epsilon = w/cutoff # Cutoff frequency
 gamma = 0.001 # Damping Rate
 
+Ic = 2*pi*hbar*mu/phi_o
+beta = 2*pi * l*Ic//phi_o
+
+
 # Operators
 adag = create_annihilation_operator(n) # Annihilation operator
 a = create_creation_operator(n) # Creation operator
@@ -41,7 +46,8 @@ P = np.sqrt((1)/(C*w*hbar)) * Q
 cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
-L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
+L_1 = gamma**(0.5) * (np.sqrt((1- epsilon)* (1 - epsilon**2))* X + (1j - epsilon/2)*(np.sqrt(1/((1- epsilon)* (1 - epsilon**2)))) * P)  
+L_2 = gamma**(0.5) * (np.sqrt((epsilon)* (1 - epsilon**2))* X + (np.sqrt(epsilon/(1 - epsilon**2)))*(1j - epsilon/2)* (beta*w/mu) * create_sin_phi(X, beta, w, mu, phi_x, phi_o))
 Ldag = L.conj().T
 
 def handler(x):

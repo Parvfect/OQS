@@ -6,7 +6,7 @@
 import numpy as np
 from helper_functions import *
 
-n = 40
+n = 14
 adag = create_annihilation_operator(n) # Annihilation operator
 a = create_creation_operator(n) # Creation operator
 

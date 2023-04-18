@@ -81,18 +81,21 @@ def steady_state_solver(L):
 
 """ Plotting functions """
 
-def plot_density_matrix_elements(rho, ti=0, title=""):
+def plot_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
     """ Plot the density matrix elements """
 
     fig, ax = plt.subplots(figsize=(12, 9))
 
     # Plotting density matrix elements - choose one off diagonal and one diagonal
     plt.plot(np.real(rho[ti:,1,1]), label = r'$\rho_{22}$')
-    plt.plot([np.trace(i) for i in rho[ti:,:,:]], label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(np.real(rho[ti:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
     plt.plot(np.imag(rho[ti:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
     purity = get_purity(rho[ti:,:,:])
-    plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+
+    if trace_purity:
+        plt.plot([np.trace(i) for i in rho[ti:,:,:]], label = r'$\mathrm{Tr}[\rho]$')
+        plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+    
     plt.xlabel('$\gamma t$')
     #plt.ylim(-0.5, 1.1)
     plt.legend(loc="lower right", numpoints=1,frameon=True)
@@ -115,7 +118,7 @@ def get_purity(rho):
     purity = [np.trace(np.dot(i,i)) for i in rho]
     return purity
 
-def plot_trace_purity(rho, title=""):
+def plot_trace_purity(rho, title="", show=True):
     """ Plot the trace and purity of the density matrix """
 
     # Calculating trace and purity
@@ -127,5 +130,7 @@ def plot_trace_purity(rho, title=""):
     plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
     plt.legend()
     plt.title("Trace and Purity of Density Matrix {}".format(title))
-    plt.show()
+    
+    if show:
+        plt.show()
 

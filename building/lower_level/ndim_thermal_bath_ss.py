@@ -3,7 +3,8 @@ import numpy as np
 from helper_functions import *
 import plotly.express as px
 
-n = 23 # Hilbert Space Dimension
+
+n = 25 # Hilbert Space Dimension
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)
@@ -15,18 +16,16 @@ p = 1j*(adag - a)/2
 H = (np.dot(p,p) + np.dot(q,q))
 H = np.array(H)
 
-# Initial Density Matrix
-rho_0 = [[0.5,0.5],[0.5,0.5]]
+# Parameters
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
 T = 300
-gamma = 0.1
+gamma = 0.001
 #print(1/(np.exp((hbar*w)/(kb*T))-1))
 nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
 sz = np.array([[1,0],[0,-1]])
 wo = 10
-#H = (wo/2) * sz 
 
 # Encoding Equation
 def LinEm():
