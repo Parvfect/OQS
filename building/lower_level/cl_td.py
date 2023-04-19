@@ -1,10 +1,10 @@
 
-
 import numpy as np
 from helper_functions import *
-from numpy.linalg import multi_dot
 
-n = 14
+
+n = 15 # Hilbert Space Dimension
+gamma = 0.001 # Damping Rate
 
 # Annihilation and Creation Operators
 Ldag = create_annihilation_operator(n)
@@ -13,18 +13,23 @@ a = create_creation_operator(n)
 # Hamiltonian
 q = (Ldag + a)/2
 p = 1j*(Ldag - a)/2
-H = (np.dot(p,p) + np.dot(q,q))
+H = (np.dot(p,p) + np.dot(q,q)) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
 
-# Parameters
+# Initial Density Matrix
+rho_0 = [[0.5,0.5],[0.5,0.5]]
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
 T = 300
-gamma = 0.01
+
+#print(1/(np.exp((hbar*w)/(kb*T))-1))
 nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
-L  = a
+sz = np.array([[1,0],[0,-1]])
+wo = 10
+L = q + p
 Ldag = np.conjugate(L).T
+#H = (wo/2) * sz 
 
 # Encoding Equation
 def LinEm(x):
@@ -47,5 +52,7 @@ if __name__ == "__main__":
     solRK = solver(solRK, LinEm, h)
 
     # Visualising
-    plot_density_matrix_elements(solRK)
-    plot_trace_purity(solRK)
+    plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
+    plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
+
+    plot_steady_state_td(solRK, title="Calderia Leggett with {}states".format(n))
