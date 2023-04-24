@@ -31,7 +31,7 @@ gamma = 0.001 # Damping Rate
 
 Ic = 2*pi*hbar*mu/phi_o
 beta = 2*pi * l*Ic//phi_o
-
+sinphi_const = np.sqrt(beta* w/mu)
 
 # Operators
 adag = create_annihilation_operator(n) # Annihilation operator

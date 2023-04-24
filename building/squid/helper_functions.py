@@ -47,12 +47,25 @@ def get_function_of_operator(f, op):
 def create_cos_phi(phi, phi_o, phi_x, alpha): 
     """
     Create a cos(phi) operator for the n-th mode     
+    loll this is wrong
+    """
+    cos_const = np.cos((2*pi)*(phi_x/phi_o))
+    sin_const = np.sin((2*pi)*(phi_x/phi_o))
+    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*(phi + phi_x))
+    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*(phi + phi_x))
+    return cos_phi - sin_phi 
+
+def create_sin_phi(phi, phi_o, phi_x, alpha):
+    """
+    Create a sin(phi) operator for the n-th mode     
     """
     cos_const = np.cos((2*pi)*(phi_x/phi_o))
     sin_const = np.sin((2*pi)*(phi_x/phi_o))
     cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*phi)
     sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
-    return cos_const*cos_phi - sin_const*sin_phi
+    return cos_const*cos_phi + sin_const*sin_phi
+
+
 
 def make_initial_density_matrix(n):
     return np.ones((n,n), dtype=complex)/n

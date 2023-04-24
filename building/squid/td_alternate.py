@@ -26,7 +26,7 @@ alpha = np.sqrt((4 * pi*pi * hbar)/(phi_o*phi_o*C))
 muomega = mu/w # 
 cutoff = 20 * w
 epsilon = w/cutoff # Cutoff frequency
-gamma = 0.001 # Damping Rate
+gamma = 0.1 # Damping Rate
 
 # Operators
 adag = create_annihilation_operator(n) # Annihilation operator
@@ -50,7 +50,7 @@ def handler(x):
     lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
     lindblad_part_3 = get_commutator(Ldag, np.dot(x, L))
     lindblad_part_4 = get_commutator(np.dot(Ldag, x), L)
-    return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2 + lindblad_part_3 + lindblad_part_4)
+    return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2 + lindblad_part_3 + 1e-8*lindblad_part_4)
 
 def run_simulation(phi_x_phi_o_ratio):
    
@@ -77,8 +77,8 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 1200
-    nsteps = 20000
+    t_f = 500
+    nsteps = 10000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)

@@ -3,7 +3,7 @@
 from helper_functions import *
 
 # Hilbert Space Dimensions
-n = 40
+n = 14
 
 # Constants
 pi = np.pi
