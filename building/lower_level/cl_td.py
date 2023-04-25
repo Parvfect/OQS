@@ -22,7 +22,7 @@ H = np.array(H)
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
-T = 1000
+T = 1
 
 L = q + (1/T)*(1j)*p
 Ldag = np.conjugate(L).T
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     solRK = solver(solRK, LinEm, h)
 
     # Visualising
-    plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
+    plot_density_matrix_elements(solRK, title="CL with {} states temperature - {}K".format(n, T))
     #plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
 
     plot_steady_state_td(solRK, title="Calderia Leggett with {}states".format(n))
