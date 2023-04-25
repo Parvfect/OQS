@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
+from tqdm import tqdm
 
 pi = np.pi
 
@@ -83,7 +84,7 @@ def RK4step(x, h, f):
 
 def solver(sol_arr, f, h):
 
-    for i in range(1, sol_arr.shape[0]):
+    for i in tqdm(range(1, sol_arr.shape[0])):
         sol_arr[i] = RK4step(sol_arr[i-1], h, f)
 
     return sol_arr
@@ -142,6 +143,7 @@ def plot_trace_purity(rho, title="", show=True):
     # Plotting
     plt.plot(trace, label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+    plt.ylim(0,2)
     plt.legend()
     plt.title("Trace and Purity of Density Matrix {}".format(title))
     

@@ -12,7 +12,7 @@ from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 5
+n = 51
 
 # Constants
 pi = np.pi
@@ -58,9 +58,9 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 500
-    nsteps = 2000
-    h = (t_f-t_i)/nsteps
+    t_f = 40
+    h = 1e-3
+    nsteps = int((t_f-t_i)/h)
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
     
@@ -69,4 +69,6 @@ if __name__ == "__main__":
     # Plotting
     plot_density_matrix_elements(t)
     plot_trace_purity(t)
+    plot_steady_state_td(t)
+    print("Steady State Purity: {}".format(np.trace(np.dot(t[-1], t[-1]))))
     

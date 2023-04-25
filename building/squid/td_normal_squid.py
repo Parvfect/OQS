@@ -26,7 +26,7 @@ alpha = np.sqrt((4 * pi*pi * hbar)/(phi_o*phi_o*C))
 muomega = mu/w # 
 cutoff = 20 * w
 epsilon = w/cutoff # Cutoff frequency
-gamma = 0.005 # Damping Rate
+gamma = 0.05 # Damping Rate
 
 # Operators
 adag = create_annihilation_operator(n) # Annihilation operator
@@ -54,8 +54,8 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 80
-    nsteps = 20000
+    t_f = 200
+    nsteps = 1000000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
@@ -64,6 +64,6 @@ if __name__ == "__main__":
 
     # Plotting
     plot_density_matrix_elements(t)
+    plot_trace_purity(t)
     plot_steady_state_td(t)
-    #plot_trace_purity(t)
-    
+      
