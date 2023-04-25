@@ -127,5 +127,6 @@ def plot_steady_state_td(rho, title=""):
     steady_state = rho[-1]
     plt.imshow(np.array(steady_state).astype(np.float64))
     plt.title("Steady State Density Matrix {}".format(title))
+    plt.colorbar()
     plt.show()
 

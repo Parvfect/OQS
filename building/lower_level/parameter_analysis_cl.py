@@ -3,6 +3,7 @@
 
 import numpy as np
 from helper_functions import *
+from tqdm import tqdm
 
 
 n = 14 # Hilbert Space Dimension
@@ -27,58 +28,56 @@ T = 1000
 L = q + (1/T)*(1j)*p
 Ldag = np.conjugate(L).T
 
-def LinEm(x):
-    hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
-    lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
-    lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
-    
-    return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)    
 
-"""
+
 def LinEm(x, L, Ldag):
-    
     hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
     lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
     lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
-
+    
     return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)    
+
+def RK4step(x, h, f, L, Ldag):
+    """ Runge Kutta step, x is the current state, h is the step size, f is the function to be integrated """
+    k1 = f(x, L, Ldag)
+    k2 = f(x+h*k1/2, L, Ldag)
+    k3 = f(x+h*k2/2, L, Ldag)
+    k4 = f(x+h*k3, L, Ldag)
+
+    return x+(h/6)*(k1+2*k2+2*k3+k4)
+
+def solver(sol_arr, f, h, L, Ldag):
+
+    for i in range(1, sol_arr.shape[0]):
+        sol_arr[i] = RK4step(sol_arr[i-1], h, f, L, Ldag)
+
+    return sol_arr
+
 
 def temp_analysis():
-    T = np.linspace(0, 500, 1)
+    T = np.arange(1, 400, 5)
     steady_state_purity = np.zeros(len(T))
-    for i in range(len(T)):
+    for i in tqdm(range(len(T))):
         L = q + (1/T[i])*(1j)*p
         Ldag = np.conjugate(L).T
         init = make_initial_density_matrix(n)
         t_i = 0
-        t_f = 1000
+        t_f = 500
         nsteps = 10000
+        h = (t_f-t_i)/nsteps
         solRK = np.zeros((nsteps+1,n, n),dtype=complex)
         solRK[0]=init
 
         # Solving
-        solRK = solver(solRK, LinEm, h)
+        solRK = solver(solRK, LinEm, h, L, Ldag)
+        #plot_density_matrix_elements(solRK)
         steady_state_purity[i] = np.trace(np.dot(solRK[-1], solRK[-1]))
+        
     plt.plot(T, steady_state_purity)
+    plt.title("Steady State Purity vs Temperature for Calderia Leggett Model")
+    plt.xlabel("Temperature")
+    plt.ylabel("Steady State Purity")
     plt.show()
-"""
 
 if __name__ == "__main__":
-    init = make_initial_density_matrix(n)
-    t_i = 0
-    t_f = 800
-    nsteps = 10000
-
-    h = (t_f-t_i)/nsteps
-    solRK = np.zeros((nsteps+1,n, n),dtype=complex)
-    solRK[0]=init
-
-    # Solving
-    solRK = solver(solRK, LinEm, h)
-
-    # Visualising
-    plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
-    #plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
-
-    plot_steady_state_td(solRK, title="Calderia Leggett with {}states".format(n))
-    print("Steady state purity is {}".format(np.trace(np.dot(solRK[-1], solRK[-1]))))
+    temp_analysis()

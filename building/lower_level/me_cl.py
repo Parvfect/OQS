@@ -1,4 +1,5 @@
 
+
 # Needs fixing
 
 import numpy as np
@@ -6,7 +7,7 @@ from helper_functions import *
 
 
 n = 14 # Hilbert Space Dimension
-gamma = 0.05 # Damping Rate
+gamma = 0.3 # Damping Rate
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)
@@ -19,31 +20,20 @@ H = (np.dot(p,p) + np.dot(q,q)) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
 
 # Initial Density Matrix
-rho_0 = [[0.5,0.5],[0.5,0.5]]
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
 T = 300
 
-#print(1/(np.exp((hbar*w)/(kb*T))-1))
-nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
-sz = np.array([[1,0],[0,-1]])
-wo = 10
 L = q + (1j)*p
 Ldag = np.conjugate(L).T
-#H = (wo/2) * sz 
-
-# Encoding Equation
-
 
 def LinEm(x):
     hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
-    lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
-    lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
-    #lindblad_part_3 = get_commutator(Ldag, np.dot(x, L))
-    #lindblad_part_4 = get_commutator(np.dot(Ldag, x), L)
-    
-    return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)    
+    second_kernel = - 1j * gamma * get_commutator(q, get_anti_commutator(p, x))
+    third_kernel = - gamma * T * get_commutator(q, get_commutator(q,x))
+
+    return hamiltonian_part + second_kernel# + third_kernel  
 
 if __name__ == "__main__":
     init = make_initial_density_matrix(n)
