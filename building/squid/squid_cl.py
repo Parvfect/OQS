@@ -8,15 +8,15 @@ from helper_functions import *
 
 
 n = 14 # Hilbert Space Dimension
-gamma = 0.05 # Damping Rate
+gamma = 0.5 # Damping Rate
 
 # Annihilation and Creation Operators
-Ldag = create_annihilation_operator(n)
+adag = create_annihilation_operator(n)
 a = create_creation_operator(n)
 
 # Hamiltonian
-q = (Ldag + a)/2
-p = 1j*(Ldag - a)/2
+q = (adag + a)/2
+p = 1j*(adag - a)/2
 cphi = create_cos_phi(q, 1, 0.2, 1)
 H = (np.dot(p,p) + np.dot(q,q) - cphi) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
@@ -33,7 +33,7 @@ nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
 sz = np.array([[1,0],[0,-1]])
 wo = 10
 epsilon = 1
-L = gamma**(0.5) * (q - (1j - epsilon/2) * p)
+L = gamma**(0.5) * (q + 0.1*(1j - epsilon/2) * p)
 Ldag = np.conjugate(L).T
 #H = (wo/2) * sz 
 
