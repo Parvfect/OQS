@@ -47,15 +47,17 @@ cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
 L_1 = gamma**(0.5) * (np.sqrt((1- epsilon)* (1 - epsilon**2))* X + (1j - epsilon/2)*(np.sqrt(1/((1- epsilon)* (1 - epsilon**2)))) * P)  
-L_2 = gamma**(0.5) * (np.sqrt((epsilon)* (1 - epsilon**2))* X + (np.sqrt(epsilon/(1 - epsilon**2)))*(1j - epsilon/2)* (beta*w/mu) * create_sin_phi(X, beta, w, mu, phi_x, phi_o))
-Ldag = L.conj().T
+L_2 = gamma**(0.5) * (np.sqrt((epsilon)* (1 - epsilon**2))* X + (np.sqrt(epsilon/(1 - epsilon**2)))*(1j - epsilon/2)* (beta*mu/w) * create_sin_phi(X, phi_o, phi_x, sinphi_const))
+L_1dag = L_1.conj().T
+L_2dag = L_2.conj().T
 
 def handler(x):
     hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
-    lindblad_part_1 = get_commutator(L, np.dot(x, Ldag))
-    lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
-    lindblad_part_3 = get_commutator(Ldag, np.dot(x, L))
-    lindblad_part_4 = get_commutator(np.dot(Ldag, x), L)
+    lindblad_part_1 = get_commutator(L_1, np.dot(x, L_1dag))
+    lindblad_part_2 = get_commutator(np.dot(L_1, x), L_1dag)  
+    lindblad_part_3 = get_commutator(L_2, np.dot(x, L_2dag))
+    lindblad_part_4 = get_commutator(np.dot(L_1, x), L_2dag)
+  
     return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2 + lindblad_part_3 + lindblad_part_4)
 
 def run_simulation(phi_x_phi_o_ratio):
@@ -83,8 +85,8 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 1200
-    nsteps = 20000
+    t_f = 800
+    nsteps = 80000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     # Plotting
     plot_density_matrix_elements(t, title=f"{n} state SQUID TD simulation")
     
-    #plot_trace_purity(t)
+    plot_trace_purity(t)
 
     # Plotting the steady state
     plot_steady_state_td(t, title=f"{n} state SQUID TD simulation steady state")

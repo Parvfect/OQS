@@ -58,8 +58,8 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 40
-    h = 1e-3
+    t_f = 20
+    h = 1e-4
     nsteps = int((t_f-t_i)/h)
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
