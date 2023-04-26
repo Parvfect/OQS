@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
 from tqdm import tqdm
+from mpl_toolkits.mplot3d import Axes3D
 
 pi = np.pi
 
@@ -139,10 +140,13 @@ def plot_trace_purity(rho, title="", show=True):
     # Calculating trace and purity
     trace = get_trace(rho)
     purity = get_purity(rho)
+    pureness = [measure_pureness_state(i) for i in rho]
     
     # Plotting
     plt.plot(trace, label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+    plt.plot(pureness, label = r'Sum of offdiags')
+    
     plt.ylim(0,2)
     plt.legend()
     plt.title("Trace and Purity of Density Matrix {}".format(title))
@@ -150,3 +154,19 @@ def plot_trace_purity(rho, title="", show=True):
     if show:
         plt.show()
 
+def wigner_plot_steady_state(t, n):
+    steady_state = t[-1]
+    X = np.arange(0,n)
+    Y = np.arange(0, n)
+    X, Y = np.meshgrid(X, Y)
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    surf = ax.plot_surface(X, Y, steady_state, rstride=1, cstride=1, cmap='hot', linewidth=0, antialiased=False)
+    ax.set_zlim(-1.01, 1.01)
+    plt.title("Steady State Wigner Function of Density Matrix")
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.show()
+
+def measure_pureness_state(rho):
+    """ Sum of off diagonal elements of matrix """
+    return (np.sum(rho) - np.sum(np.diag(rho)))

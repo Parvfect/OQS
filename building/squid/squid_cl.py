@@ -28,12 +28,12 @@ hbar = 1e-34
 kb = 1.38e-23
 T = 300
 
-#print(1/(np.exp((hbar*w)/(kb*T))-1))
+#print(1/(np.exp((hbar*w)/(kb*T))-1))   
 nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
 sz = np.array([[1,0],[0,-1]])
 wo = 10
 epsilon = 1
-L = gamma**(0.5) * (q + 0.1*(1j - epsilon/2) * p)
+L = gamma**(0.5) * (np.dot(a,a))
 Ldag = np.conjugate(L).T
 #H = (wo/2) * sz 
 
@@ -52,7 +52,7 @@ def LinEm(x):
 if __name__ == "__main__":
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 2000
+    t_f = 700
     nsteps = 10000
 
     h = (t_f-t_i)/nsteps
@@ -64,6 +64,8 @@ if __name__ == "__main__":
 
     # Visualising
     plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
-    #plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
+    plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
 
     plot_steady_state_td(solRK, title="Calderia Leggett with {}states".format(n))
+    
+    #wigner_plot_steady_state(solRK, n)

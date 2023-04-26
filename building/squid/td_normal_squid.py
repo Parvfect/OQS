@@ -38,10 +38,10 @@ phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to posit
 # Dimensionless position and momentum operators
 X = np.sqrt((C*w)/hbar) * phi
 P = np.sqrt((1)/(C*w*hbar)) * Q
-cphi = muomega * create_cos_phi(X, phi_o, phi_x, 2 * pi /phi_o)
+cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_anti_commutator(X, P) 
-L = gamma**(0.5) * (X  - (1j - epsilon/2) * P)
+L = gamma**(0.5) * (X  + (1j - epsilon/2) * P)
 Ldag = L.conj().T
 
 def handler(x):
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # Setting simulation parameters
     t_i = 0
     t_f = 200
-    nsteps = 1000000
+    nsteps = 10000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
