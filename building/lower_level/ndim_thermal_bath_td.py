@@ -29,15 +29,15 @@ Ldag = np.conjugate(L).T
 # Encoding Equation
 def LinEm(x):
     res = -1j*(np.dot(H,x)-np.dot(x,H))
-    res += gamma*(nth+1)*(multi_dot([Ldag,x,L])-0.5*multi_dot([L,Ldag,x])-0.5*multi_dot([x,L,Ldag]))
+    #res += gamma*(nth+1)*(multi_dot([Ldag,x,L])-0.5*multi_dot([L,Ldag,x])-0.5*multi_dot([x,L,Ldag]))
     #res += gamma*nth*(multi_dot([L,x,Ldag])-0.5*multi_dot([Ldag,L,x])-0.5*multi_dot([x,Ldag,L]))    
     return res
 
 if __name__ == "__main__":
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 100
-    nsteps = 800
+    t_f = 40
+    nsteps = 80000
 
     h = (t_f-t_i)/nsteps
     solRK = np.zeros((nsteps+1,n, n),dtype=complex)

@@ -1,21 +1,20 @@
 
 """
-convert to matrix diff form and see what the steady state looks like
-Dynamics are not too bad if one is assuming that the initial moment of coupling
-is within the simulation. Very interesting about the trace and purity though
+Something pecuilar different between td_normal_squid and td_squid causing differneces of major order
+find and understand
 """
 
 from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 51
+n = 14
 
 # Constants
 pi = np.pi
 C = 5e-15
 l = 3e-10
-je = 9e-22
+je = 9.99e-22
 hbar = 1e-34
 w = 8.16e11
 e = 1.6e-19

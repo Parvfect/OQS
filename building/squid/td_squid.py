@@ -12,7 +12,7 @@ from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 51
+n = 14
 
 # Constants
 pi = np.pi
@@ -29,11 +29,11 @@ alpha = np.sqrt((4 * pi*pi * hbar)/(phi_o*phi_o*C))
 muomega = mu/w # 
 cutoff = 20 * w
 epsilon = w/cutoff # Cutoff frequency
-gamma = 0.1 # Damping Rate
+gamma = 0.05 # Damping Rate
 
 # Operators
-a = create_annihilation_operator(n) # Annihilation operator
-adag = create_creation_operator(n) # Creation operator
+adag = create_annihilation_operator(n) # Annihilation operator
+a = create_creation_operator(n) # Creation operator
 
 Q = (np.sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)) # Momentum operator
 phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to position operator)
@@ -58,8 +58,8 @@ if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 20
-    h = 1e-4
+    t_f = 500
+    h = 1e-2
     nsteps = int((t_f-t_i)/h)
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
@@ -70,5 +70,7 @@ if __name__ == "__main__":
     plot_density_matrix_elements(t)
     plot_trace_purity(t)
     plot_steady_state_td(t)
-    print("Steady State Purity: {}".format(np.trace(np.dot(t[-1], t[-1]))))
+    ssp = np.trace(np.dot(t[-1], t[-1]))
+    ssp = np.sqrt(ssp.real**2 + ssp.imag**2)
+    print("Steady State Purity: {}".format(ssp))
     

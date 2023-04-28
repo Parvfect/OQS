@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
+from tqdm import tqdm
 
 pi = np.pi
 
@@ -47,12 +48,25 @@ def get_function_of_operator(f, op):
 def create_cos_phi(phi, phi_o, phi_x, alpha): 
     """
     Create a cos(phi) operator for the n-th mode     
+    loll this is wrong
+    """
+    cos_const = np.cos((2*pi)*(phi_x/phi_o))
+    sin_const = np.sin((2*pi)*(phi_x/phi_o))
+    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*(phi + phi_x))
+    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*(phi + phi_x))
+    return cos_phi - sin_phi 
+
+def create_sin_phi(phi, phi_o, phi_x, alpha):
+    """
+    Create a sin(phi) operator for the n-th mode     
     """
     cos_const = np.cos((2*pi)*(phi_x/phi_o))
     sin_const = np.sin((2*pi)*(phi_x/phi_o))
     cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*phi)
     sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
-    return cos_const*cos_phi - sin_const*sin_phi
+    return cos_const*cos_phi + sin_const*sin_phi
+
+
 
 def make_initial_density_matrix(n):
     return np.ones((n,n), dtype=complex)/n
@@ -70,7 +84,7 @@ def RK4step(x, h, f):
 
 def solver(sol_arr, f, h):
 
-    for i in range(1, sol_arr.shape[0]):
+    for i in tqdm(range(1, sol_arr.shape[0])):
         sol_arr[i] = RK4step(sol_arr[i-1], h, f)
 
     return sol_arr
@@ -81,18 +95,21 @@ def steady_state_solver(L):
 
 """ Plotting functions """
 
-def plot_density_matrix_elements(rho, ti=0, title=""):
+def plot_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
     """ Plot the density matrix elements """
 
     fig, ax = plt.subplots(figsize=(12, 9))
 
     # Plotting density matrix elements - choose one off diagonal and one diagonal
     plt.plot(np.real(rho[ti:,1,1]), label = r'$\rho_{22}$')
-    plt.plot([np.trace(i) for i in rho[ti:,:,:]], label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(np.real(rho[ti:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
     plt.plot(np.imag(rho[ti:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
     purity = get_purity(rho[ti:,:,:])
-    plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+
+    if trace_purity:
+        plt.plot([np.trace(i) for i in rho[ti:,:,:]], label = r'$\mathrm{Tr}[\rho]$')
+        plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+    
     plt.xlabel('$\gamma t$')
     #plt.ylim(-0.5, 1.1)
     plt.legend(loc="lower right", numpoints=1,frameon=True)
@@ -100,6 +117,13 @@ def plot_density_matrix_elements(rho, ti=0, title=""):
 
     plt.show()
 
+
+def plot_steady_state_td(rho, title=""):
+    steady_state = rho[-1]
+    plt.imshow(np.array(steady_state).astype(np.float64))
+    plt.title("Steady State Density Matrix {}".format(title))
+    plt.colorbar()
+    plt.show()
 
 def get_trace(rho):
     trace = [np.trace(i) for i in rho]
@@ -109,7 +133,7 @@ def get_purity(rho):
     purity = [np.trace(np.dot(i,i)) for i in rho]
     return purity
 
-def plot_trace_purity(rho, title=""):
+def plot_trace_purity(rho, title="", show=True):
     """ Plot the trace and purity of the density matrix """
 
     # Calculating trace and purity
@@ -119,14 +143,10 @@ def plot_trace_purity(rho, title=""):
     # Plotting
     plt.plot(trace, label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
+    plt.ylim(0,2)
     plt.legend()
     plt.title("Trace and Purity of Density Matrix {}".format(title))
-    plt.show()
-
-def plot_steady_state_td(rho, title=""):
-    steady_state = rho[-1]
-    plt.imshow(np.array(steady_state).astype(np.float64))
-    plt.title("Steady State Density Matrix {}".format(title))
-    plt.colorbar()
-    plt.show()
+    
+    if show:
+        plt.show()
 
