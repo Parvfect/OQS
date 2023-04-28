@@ -7,7 +7,7 @@ def qho_potential(x):
     return 0.5 * x**2
 
 def squid_potential(x):
-    return 0.5 * x**2 - 3 * np.cos(x+3.14)
+    return 0.5 * x**2 - 3 * np.cos(x + 3.14)
 
 
 t = np.linspace(-10, 10, 1000)

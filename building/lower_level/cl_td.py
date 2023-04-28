@@ -22,7 +22,7 @@ H = np.array(H)
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
-T = 1
+T = 40
 
 L = q + (1/T)*(1j)*p
 Ldag = np.conjugate(L).T
