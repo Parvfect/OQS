@@ -46,16 +46,15 @@ def get_function_of_operator(f, op):
     
     return result
 
-def create_cos_phi(phi, phi_o, phi_x, alpha): 
+def create_cos_phi(phi, phi_o, phi_x): 
     """
     Create a cos(phi) operator for the n-th mode     
     loll this is wrong
     """
-    cos_const = np.cos((2*pi)*(phi_x/phi_o))
-    sin_const = np.sin((2*pi)*(phi_x/phi_o))
-    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*(phi + phi_x))
-    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*(phi + phi_x))
-    return cos_phi - sin_phi 
+    const = np.cos((2*pi/phi_o))
+    cos_phi = get_function_of_operator(lambda x: np.cos(x), const*(phi + phi_x))
+    sin_phi = get_function_of_operator(lambda x: np.sin(x), const*(phi + phi_x))
+    return cos_phi - sin_phi
 
 def create_sin_phi(phi, phi_o, phi_x, alpha):
     """

@@ -9,7 +9,7 @@ from helper_functions import *
 
 
 # Hilbert Space Dimensions
-n = 14
+n = 3
 
 # Constants
 pi = np.pi
@@ -32,25 +32,27 @@ gamma = 0.001 # Damping Rate
 adag = create_annihilation_operator(n) # Annihilation operator
 a = create_creation_operator(n) # Creation operator
 
-Q = (np.sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)) # Momentum operator
-phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to position operator)
+Q =  (1j)* (adag - a) # Momentum operator
+phi = (adag + a) # Flux operator (analogous to position operator)
 
-# Dimensionless position and momentum operators
-X = np.sqrt((C*w)/hbar) * phi
-P = np.sqrt((1)/(C*w*hbar)) * Q
-cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
+cphi = create_cos_phi(phi, phi_o, phi_x)
 
-H =  (np.dot(X, X) + np.dot(P, P) - 7*cphi )# + (hbar*gamma/2)*get_commutator(X, P)
+H =  (np.dot(phi, phi) + np.dot(Q, Q) )#- cphi ) #+ (hbar*gamma/2)*get_commutator(phi, Q)
+
 
 def handler(x):
-    return (-1j)* (np.dot(H, x) - np.dot(x, H))
-    
+    return -1j* (np.dot(H, x) - np.dot(x, H))
+
+# Initial State
+rho = make_initial_density_matrix(n)
+
+
 if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 100
-    nsteps = 20000
+    t_f = 20
+    nsteps = 2000
     h = (t_f-t_i)/nsteps
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
@@ -60,3 +62,6 @@ if __name__ == "__main__":
     # Plotting
     plot_density_matrix_elements(t, title=f"{n} state SQUID TD simulation", trace_purity=False)
     
+
+
+
