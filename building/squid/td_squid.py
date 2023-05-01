@@ -45,6 +45,7 @@ cphi = muomega * (create_cos_phi(X, phi_o, phi_x, alpha))
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_anti_commutator(X, P)
 L = gamma**(0.5) * (X + 0.01*(1j - epsilon/2) * P)
+#L = a - adag
 Ldag = L.conj().T
 
 
