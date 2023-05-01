@@ -95,15 +95,47 @@ def steady_state_solver(L):
 
 """ Plotting functions """
 
+def plot_diagonal_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
+
+    fig, ax = plt.subplots(figsize=(12, 9))
+    for i in range(0, rho.shape[1]):
+        plt.plot(np.real(rho[ti:,i,i]), label = 'Re{}{}'.format(i+1, i+1))
+    plt.xlabel('$\gamma t$')
+    plt.ylabel("Probability")
+    #plt.ylim(-0.5, 1.1)
+    plt.legend(loc="lower right", numpoints=1,frameon=True)
+    plt.title("Density Matrix Dynamics {}".format(title))
+
+    plt.show()
+
+def plot_offdiagonal_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
+    """ Plots the off diagonal density matrix elements """  
+    
+    fig, ax = plt.subplots(figsize=(12, 9))
+
+    for i in range(0, rho.shape[1]):
+        for j in range(i+1, rho.shape[1]):
+            plt.plot(np.real(rho[ti:,i,j]), label = 'Re{}{}'.format(i+1, j+1))
+            plt.plot(np.imag(rho[ti:,i,j]), label = 'Im{}{}'.format(i+1, j+1))
+    plt.xlabel('$\gamma t$')
+    plt.ylabel("Probability")
+    #plt.ylim(-0.5, 1.1)
+    plt.title("Dynamics of Off Diagonal Elements of the Density Matrix {}".format(title))
+
+    plt.show()
+
 def plot_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
     """ Plot the density matrix elements """
 
     fig, ax = plt.subplots(figsize=(12, 9))
 
+    
     # Plotting density matrix elements - choose one off diagonal and one diagonal
     plt.plot(np.real(rho[ti:,1,1]), label = r'$\rho_{22}$')
     plt.plot(np.real(rho[ti:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
     plt.plot(np.imag(rho[ti:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
+    plt.plot(np.real(rho[ti:,3,4]), label = r'$\rho_{45}$')
+    plt.plot(np.real(rho[ti:,2,3]), label = r'$\mathrm{Re}[\rho_{34}]$')
     purity = get_purity(rho[ti:,:,:])
 
     if trace_purity:

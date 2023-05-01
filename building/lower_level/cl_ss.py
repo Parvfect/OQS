@@ -1,10 +1,13 @@
 
 # Maybe try the normal one first aloha
+# The CL SS from matlab seems to give purity 1 as well, hmm
+
+
 from helper_functions import *
 
 # Hilbert Space Dimensions
-n = 14
-gamma = 0.05 # Damping Rate
+n = 9
+gamma = 0.2 # Damping Rate
 
 # Operators
 adag = create_annihilation_operator(n) # Annihilation operator
