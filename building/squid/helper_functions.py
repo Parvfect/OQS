@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
 from tqdm import tqdm
-from mpl_toolkits.mplot3d import Axes3D
 
 pi = np.pi
 
@@ -46,26 +45,26 @@ def get_function_of_operator(f, op):
     
     return result
 
-def create_cos_phi(phi, phi_o, phi_x): 
+def create_cos_phi(phi, phi_o, phi_x, alpha): 
     """
     Create a cos(phi) operator for the n-th mode     
     loll this is wrong
     """
-    const = np.cos((2*pi/phi_o))
-    cos_phi = get_function_of_operator(lambda x: np.cos(x), const*(phi + phi_x))
-    sin_phi = get_function_of_operator(lambda x: np.sin(x), const*(phi + phi_x))
-    return cos_phi - sin_phi
+    cos_const = np.cos((2*pi)*(phi_x/phi_o))
+    sin_const = np.sin((2*pi)*(phi_x/phi_o))
+    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*(phi + phi_x))
+    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*(phi + phi_x))
+    return cos_phi - sin_phi 
 
 def create_sin_phi(phi, phi_o, phi_x, alpha):
     """
     Create a sin(phi) operator for the n-th mode     
     """
-    const = np.cos((2*pi)*(phi_x/phi_o))
-    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*phi + const)
-    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi + const)
-    return cos_phi + sin_phi
-
-
+    cos_const = np.cos((2*pi)*(phi_x/phi_o))
+    sin_const = np.sin((2*pi)*(phi_x/phi_o))
+    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*phi)
+    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
+    return cos_const*cos_phi + sin_const*sin_phi
 
 def make_initial_density_matrix(n):
     return np.ones((n,n), dtype=complex)/n
@@ -94,13 +93,43 @@ def steady_state_solver(L):
 
 """ Plotting functions """
 
+def plot_diagonal_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
+
+    fig, ax = plt.subplots(figsize=(12, 9))
+    for i in range(0, rho.shape[1]):
+        plt.plot(np.real(rho[ti:,i,i]), label = 'Re{}{}'.format(i+1, i+1))
+    plt.xlabel('$\gamma t$')
+    plt.ylabel("Probability")
+    #plt.ylim(-0.5, 1.1)
+    plt.legend(loc="lower right", numpoints=1,frameon=True)
+    plt.title("Diagonal elements Density Matrix Dynamics {}".format(title))
+
+    plt.show()
+
+def plot_offdiagonal_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
+    """ Plots the off diagonal density matrix elements """  
+    
+    fig, ax = plt.subplots(figsize=(12, 9))
+
+    for i in range(0, rho.shape[1]):
+        for j in range(i+1, rho.shape[1]):
+            plt.plot(np.real(rho[ti:,i,j]), label = 'Re{}{}'.format(i+1, j+1))
+            plt.plot(np.imag(rho[ti:,i,j]), label = 'Im{}{}'.format(i+1, j+1))
+    plt.xlabel('$\gamma t$')
+    plt.ylabel("Probability")
+    #plt.ylim(-0.5, 1.1)
+    plt.title("Dynamics of Off Diagonal Elements of the Density Matrix {}".format(title))
+
+    plt.show()
+
 def plot_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
     """ Plot the density matrix elements """
 
     fig, ax = plt.subplots(figsize=(12, 9))
 
+    
     # Plotting density matrix elements - choose one off diagonal and one diagonal
-    plt.plot(np.real(rho[ti:,1,1]), label = r'$\rho_{22}$')
+    plt.plot(np.real(rho[ti:,0,0]), label = r'$\rho_{11}$')
     plt.plot(np.real(rho[ti:,0,1]), label = r'$\mathrm{Re}[\rho_{12}]$')
     plt.plot(np.imag(rho[ti:,0,1]), label = r'$\mathrm{Im}[\rho_{12}]$')
     purity = get_purity(rho[ti:,:,:])
@@ -132,28 +161,33 @@ def get_purity(rho):
     purity = [np.trace(np.dot(i,i)) for i in rho]
     return purity
 
-def plot_trace_purity(rho, title="", show=True):
+def plot_trace_purity(rho, title="", show=True, pureness=False):
     """ Plot the trace and purity of the density matrix """
 
     # Calculating trace and purity
     trace = get_trace(rho)
     purity = get_purity(rho)
-    pureness = [measure_pureness_state(i) for i in rho]
     
     # Plotting
     plt.plot(trace, label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(purity, label = r'$\mathrm{Tr}[\rho^2]$')
-    plt.plot(pureness, label = r'Sum of offdiags')
     
-    plt.ylim(0,2)
+    
     plt.legend()
-    plt.title("Trace and Purity of Density Matrix {}".format(title))
+    plt.title("Trace, Purity of Density Matrix {}".format(title))
     
     if show:
         plt.show()
 
-def wigner_plot_steady_state(t, n):
+
+def measure_pureness_state(rho):
+    """ Sum of off diagonal elements of matrix """
+    return (np.sum(rho) - np.sum(np.diag(rho)))
+
+
+def wigner_plot_steady_state(t):
     steady_state = t[-1]
+    n = steady_state.shape[0]
     X = np.arange(0,n)
     Y = np.arange(0, n)
     X, Y = np.meshgrid(X, Y)
@@ -161,10 +195,6 @@ def wigner_plot_steady_state(t, n):
     ax = fig.add_subplot(projection='3d')
     surf = ax.plot_surface(X, Y, steady_state, rstride=1, cstride=1, cmap='hot', linewidth=0, antialiased=False)
     ax.set_zlim(-1.01, 1.01)
-    plt.title("Steady State Wigner Function of Density Matrix")
+    plt.title("Steady State Density Matrix")
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
-
-def measure_pureness_state(rho):
-    """ Sum of off diagonal elements of matrix """
-    return (np.sum(rho) - np.sum(np.diag(rho)))

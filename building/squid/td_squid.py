@@ -44,7 +44,7 @@ P = np.sqrt((1)/(C*w*hbar)) * Q
 cphi = muomega * (create_cos_phi(X, phi_o, phi_x, alpha))
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_anti_commutator(X, P)
-L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
+L = gamma**(0.5) * (X + 0.01*(1j - epsilon/2) * P)
 Ldag = L.conj().T
 
 
@@ -69,8 +69,8 @@ if __name__ == "__main__":
     # Plotting
     plot_density_matrix_elements(t)
     plot_trace_purity(t)
+    plot_diagonal_density_matrix_elements(t)
+    plot_offdiagonal_density_matrix_elements(t)
     plot_steady_state_td(t)
-    ssp = np.trace(np.dot(t[-1], t[-1]))
-    ssp = np.sqrt(ssp.real**2 + ssp.imag**2)
-    print("Steady State Purity: {}".format(ssp))
+    wigner_plot_steady_state(t)
     
