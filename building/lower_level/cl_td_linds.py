@@ -1,4 +1,5 @@
 
+
 # Needs fixing
 
 import numpy as np
@@ -15,16 +16,16 @@ a = create_creation_operator(n)
 # Hamiltonian
 q = (adag + a)/2
 p = 1j*(adag - a)/2
-H = (np.dot(p,p) + np.dot(q,q)) #+ gamma/2 * get_anti_commutator(q,p)
+H = (np.dot(p,p) + np.dot(q,q)) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
 
 # Initial Density Matrix
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
-T = 100
+T = 1
 
-L = q + 1/T*(1j)*p
+L = a - adag
 Ldag = np.conjugate(L).T
 
 def LinEm(x):
@@ -52,8 +53,8 @@ if __name__ == "__main__":
     # Visualising
     plot_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
     #plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
-    #plot_diagonal_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
-    #plot_offdiagonal_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
+    plot_diagonal_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
+    plot_offdiagonal_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
     plot_trace_purity(solRK, title="CL Model at {} Temperature".format("Low"))
     wigner_plot_steady_state(solRK)
     plot_steady_state_td(solRK, title="CL Model at {} Temperature".format("Low"))
