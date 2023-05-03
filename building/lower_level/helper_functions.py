@@ -166,7 +166,7 @@ def plot_trace_purity(rho, title="", pureness=False):
     
     plt.plot(get_trace(rho), label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(get_purity(rho), label = r'$\mathrm{Tr}[\rho^2]$')
-    plt.plot([1 - i for i in purity], label = r'$\mathrm{Decoherence}$')
+    plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Decoherence}$')
     
     plt.legend()
     plt.title("Trace, Purity of Density Matrix {}".format(title))
