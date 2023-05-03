@@ -55,11 +55,41 @@ def handler(x):
     lindblad_part_2 = get_commutator(np.dot(L, x), Ldag)
     return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2)
 
+def first_order_equation():
+    """ First order equation for steady state """
+    hamiltonian_part = -(1j) * (np.kron(H, np.identity(n)) - np.kron(np.identity(n), H)) 
+    lindblad_part_1 = np.kron(Ldag, L) 
+    lindblad_part_2 = -0.5*(np.kron(np.identity(n), np.dot(Ldag, L)) + np.kron(np.dot(Ldag, L), np.identity(n)))
+    return hamiltonian_part + lindblad_part_1 + lindblad_part_2
+
+def validate_steady_state():
+    times = np.arange(4, 1000, 50)
+    lrho_sum = []
+
+    for t in tqdm(times):
+        t_i = 0
+        t_f = t
+        h = 1e-2
+        nsteps = int((t_f-t_i)/h)
+        sol = np.zeros((nsteps+1, n,n), dtype=complex)
+        sol[0] = make_initial_density_matrix(n)
+        
+        sol = solver(sol, handler, h)
+        lrho_sum.append(np.sum(np.dot(first_order_equation(), sol[-1].reshape(n*n, 1))))
+
+    plt.plot(times, lrho_sum)
+    plt.title("Steady State Validation, sum(Lrho) vs Length of Simulation")
+    plt.ylabel("sum(Lrho) = dp/dt")
+    plt.xlabel("Length of Simulation")
+    plt.show()
+
 if __name__ == "__main__":
 
+    validate_steady_state()
+    """
     # Setting simulation parameters
     t_i = 0
-    t_f = 500
+    t_f = 5000
     h = 1e-2
     nsteps = int((t_f-t_i)/h)
     t = np.zeros((nsteps+1, n,n), dtype=complex)
@@ -72,6 +102,9 @@ if __name__ == "__main__":
     plot_trace_purity(t)
     plot_diagonal_density_matrix_elements(t)
     plot_offdiagonal_density_matrix_elements(t)
-    plot_steady_state_td(t)
-    wigner_plot_steady_state(t)
-    
+    plot_steady_state_td_2d(t)
+    plot_steady_state_td_3d(t)
+
+    steady_state = t[-1]
+    print(np.dot(np.kron(L, np.eye(n)), steady_state.reshape(n*n, 1)))
+    """
