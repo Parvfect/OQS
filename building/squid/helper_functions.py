@@ -66,6 +66,29 @@ def create_sin_phi(phi, phi_o, phi_x, alpha):
     sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
     return cos_const*cos_phi + sin_const*sin_phi
 
+def validate_steady_state(handler, Lrho, n):
+    """ Validates whether the steady state is correct by checking if Lrho approaches 0 """
+
+    times = np.arange(4, 500, 50)
+    lrho_sum = []
+    for t in tqdm(times):
+        t_i = 0
+        t_f = t
+        h = 1e-2
+        nsteps = int((t_f-t_i)/h)
+        sol = np.zeros((nsteps+1, n,n), dtype=complex)
+        sol[0] = make_initial_density_matrix(n)
+        
+        sol = solver(sol, handler, h)
+        lrho_sum.append(np.sum(np.dot(Lrho, sol[-1].reshape(n*n, 1))))
+
+    plt.plot(times, lrho_sum)
+    plt.title("Steady State Validation, sum(Lrho) vs Length of Simulation")
+    plt.ylabel("sum(Lrho) = dp/dt")
+    plt.xlabel("Length of Simulation")
+    plt.show()
+
+
 """ Miscallaneous functions """
 
 def make_initial_density_matrix(n):
@@ -201,3 +224,22 @@ def plot_steady_state_td_3d(t):
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
     return
+
+""" Simulation functions  - to be converted to main command centre """
+
+def run_simulation(n, handler, t_i=0, t_f=1000, h=1e-2):
+    # Setting simulation parameters
+    
+    nsteps = int((t_f-t_i)/h)
+    t = np.zeros((nsteps+1, n,n), dtype=complex)
+    t[0] = make_initial_density_matrix(n)
+    
+    t = solver(t, handler, h)
+
+    # Plotting
+    plot_density_matrix_elements(t)
+    plot_trace_purity(t)
+    plot_diagonal_density_matrix_elements(t)
+    plot_offdiagonal_density_matrix_elements(t)
+    plot_steady_state_td_2d(t)
+    plot_steady_state_td_3d(t)

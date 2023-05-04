@@ -35,7 +35,7 @@ P = np.sqrt((1)/(C*w*hbar)) * Q
 cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
-L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
+L = gamma**(0.5) * (X + 0.1*(1j - epsilon/2) * P)
 Ldag = L.conj().T
 
 
@@ -52,16 +52,7 @@ def handler(x):
     return np.dot(L, x.reshape(n*n, 1)).reshape(n, n)
 
 if __name__ == "__main__":
+    
     # Setting simulation parameters
-    t_i = 0
-    t_f = 200
-    nsteps = 2000
-    h = (t_f-t_i)/nsteps
-    t = np.zeros((nsteps+1, n,n), dtype=complex)
-    t[0] = make_initial_density_matrix(n)
-
-    t = solver(t, handler, h)
-
-    # Plotting
-    plot_density_matrix_elements(t)
-    plot_trace_purity(t)
+    run_simulation(n, handler, t_i=0, t_f=200, h=1e-3)
+    
