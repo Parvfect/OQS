@@ -110,6 +110,17 @@ def measure_pureness_state(rho):
     """ Sum of off diagonal elements of matrix """
     return (np.sum(rho) - np.sum(np.diag(rho)))
 
+def create_phi(n):
+    return create_annihilation_operator(n) + create_creation_operator(n)
+
+def exponential_series(x, n):
+    """ Returns the exponential series of x to the n-th term for matrices"""
+    return np.sum([np.linalg.matrix_power(x, i)/np.math.factorial(i) for i in range(0,n)], axis=0)
+
+def cosphi_taylor(phi, n):
+
+    return (exponential_series(1j*phi, n) + exponential_series(-1j*phi, n))/2
+
 """ RK4 solver """
 
 def RK4step(x, h, f):

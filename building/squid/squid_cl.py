@@ -17,7 +17,7 @@ a = create_creation_operator(n)
 # Hamiltonian
 q = (adag + a)/2
 p = 1j*(adag - a)/2
-cphi = create_cos_phi(q, 1, 0.2, 1)
+cphi = cosphi_taylor(q-0.5, 10)
 H = (np.dot(p,p) + np.dot(q,q) - cphi) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
 
@@ -50,22 +50,4 @@ def LinEm(x):
     return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)    
 
 if __name__ == "__main__":
-    init = make_initial_density_matrix(n)
-    t_i = 0
-    t_f = 700
-    nsteps = 10000
-
-    h = (t_f-t_i)/nsteps
-    solRK = np.zeros((nsteps+1,n, n),dtype=complex)
-    solRK[0]=init
-
-    # Solving
-    solRK = solver(solRK, LinEm, h)
-
-    # Visualising
-    plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
-    plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
-
-    plot_steady_state_td(solRK, title="Calderia Leggett with {}states".format(n))
-    
-    #wigner_plot_steady_state(solRK, n)
+    run_simulation(n, LinEm, t_i=0, t_f=300, h=1e-2)

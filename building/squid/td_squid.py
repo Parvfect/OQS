@@ -33,7 +33,7 @@ phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to posit
 X = np.sqrt((C*w)/hbar) * phi
 P = np.sqrt((1)/(C*w*hbar)) * Q
 cphi = muomega * (create_cos_phi(X, phi_o, phi_x, alpha))
-
+#cphi = cosphi_taylor(X-0.3, n)
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_anti_commutator(X, P)
 L = gamma**(0.5) * (X + 0.01*(1j - epsilon/2) * P)
 #L = a - adag
@@ -50,4 +50,4 @@ def handler(x):
 if __name__ == "__main__":
 
     # Setting simulation parameters
-    run_simulation(n, handler, t_i=0, t_f=200, h=1e-3)
+    run_simulation(n, handler, t_i=0, t_f=200, h=1e-2)
