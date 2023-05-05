@@ -1,11 +1,5 @@
 
-"""
-Something pecuilar different between td_normal_squid and td_squid causing differneces of major order
-find and understand
-"""
-
 from helper_functions import *
-
 
 # Hilbert Space Dimensions
 n = 14
@@ -31,17 +25,32 @@ gamma = 0.05 # Damping Rate
 a = create_annihilation_operator(n) # Annihilation operator
 adag = create_creation_operator(n) # Creation operator
 
-Q = (np.sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)) # Momentum operator
-phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to position operator)
+momentum_constant = np.sqrt((hbar*C*w))
+position_constant = np.sqrt((hbar)/(C*w))
 
-# Dimensionless position and momentum operators
-X = np.sqrt((C*w)/hbar) * phi
-P = np.sqrt((1)/(C*w*hbar)) * Q
-cphi = muomega * create_cos_phi(phi, phi_o, phi_x)
+X = np.sqrt((C*w)/hbar) * position_constant * create_position_operator(n) 
+P = np.sqrt((1)/(C*w*hbar)) * momentum_constant * create_momentum_operator(n)
+cphi = muomega * create_cos_phi(position_constant*create_position_operator(n), phi_o, phi_x, alpha)
+#cphi = cosphi_taylor(create_position_operator(n), 40)
 
-H =  (np.dot(X, X) + np.dot(P, P) - gamma*cphi) + (hbar*gamma/2)*get_anti_commutator(X, P) 
+H =  (np.dot(X, X) + np.dot(P, P) ) + (hbar*gamma/2)*get_anti_commutator(X, P) 
 L = gamma**(0.5) * (X  + (1j - epsilon/2) * P)
 Ldag = L.conj().T
+
+def hal(n, gamma=0.05, C=5e-15, l=3e-10, w=8.16e11, flux_ratio = 0.5, cutoff_bound=20):
+        
+    momentum_constant = np.sqrt((hbar*C*w))
+    position_constant = np.sqrt((hbar)/(C*w))
+
+    X = np.sqrt((C*w)/hbar) * position_constant * create_position_operator(n) 
+    P = np.sqrt((1)/(C*w*hbar)) * momentum_constant * create_momentum_operator(n)
+    cphi = muomega * create_cos_phi(position_constant*create_position_operator(n), phi_o, phi_x, alpha)
+    #cphi = cosphi_taylor(create_position_operator(n), 40)
+
+    H =  (np.dot(X, X) + np.dot(P, P) ) + (hbar*gamma/2)*get_anti_commutator(X, P) 
+    L = gamma**(0.5) * (X  + (1j - epsilon/2) * P)
+
+    return H, L, gamma
 
 def handler(x):
     hamiltonian_part = (-1j)* (np.dot(H, x) - np.dot(x, H))
@@ -52,17 +61,7 @@ def handler(x):
 if __name__ == "__main__":
 
     # Setting simulation parameters
-    t_i = 0
-    t_f = 200
-    nsteps = 10000
-    h = (t_f-t_i)/nsteps
-    t = np.zeros((nsteps+1, n,n), dtype=complex)
-    t[0] = make_initial_density_matrix(n)
-    
-    t = solver(t, handler, h)
-
-    # Plotting
-    plot_density_matrix_elements(t)
-    plot_trace_purity(t)
-    plot_steady_state_td(t)
+    H, L, gamma = hal(n)
+    run_simulation(n, H, L, gamma)
+    #run_normal_simulation(n, handler)
       

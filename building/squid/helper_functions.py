@@ -26,10 +26,10 @@ def create_annihilation_operator(n):
     return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
 
 def create_position_operator(n):
-    return (create_annihilation_operator(n) + create_creation_operator(n))/2
+    return (create_annihilation_operator(n) + create_creation_operator(n))/np.sqrt(2)
 
 def create_momentum_operator(n):
-    return (1j)*(create_creation_operator(n) - create_annihilation_operator(n))/2
+    return (1j)*(create_creation_operator(n) - create_annihilation_operator(n))/np.sqrt(2)
 
 def get_function_of_operator(f, op):
     """ Return the function of the operator using Sylvester's formula """
@@ -95,6 +95,16 @@ def validate_steady_state(handler, Lrho, n):
     plt.xlabel("Length of Simulation")
     plt.show()
 
+def create_phi(n):
+    return create_annihilation_operator(n) + create_creation_operator(n)
+
+def exponential_series(x, n):
+    """ Returns the exponential series of x to the n-th term for matrices"""
+    return np.sum([np.linalg.matrix_power(x, i)/np.math.factorial(i) for i in range(0,n)], axis=0)
+
+def cosphi_taylor(phi, n):
+
+    return (exponential_series(1j*phi, n) + exponential_series(-1j*phi, n))/2
 
 """ Miscallaneous functions """
 
@@ -120,17 +130,6 @@ def get_purity(rho):
 def measure_pureness_state(rho):
     """ Sum of off diagonal elements of matrix """
     return (np.sum(rho) - np.sum(np.diag(rho)))
-
-def create_phi(n):
-    return create_annihilation_operator(n) + create_creation_operator(n)
-
-def exponential_series(x, n):
-    """ Returns the exponential series of x to the n-th term for matrices"""
-    return np.sum([np.linalg.matrix_power(x, i)/np.math.factorial(i) for i in range(0,n)], axis=0)
-
-def cosphi_taylor(phi, n):
-
-    return (exponential_series(1j*phi, n) + exponential_series(-1j*phi, n))/2
 
 """ RK4 solver """
 
@@ -249,7 +248,7 @@ def plot_steady_state_td_3d(t):
 
 """ Simulation functions  - to be converted to main command centre """
 
-def run_normal_simulation(n, handler, t_i=0, t_f=1000, h=1e-2):
+def run_normal_simulation(n, handler, t_i=0, t_f=200, h=1e-2):
     
     nsteps = int((t_f-t_i)/h)
     t = np.zeros((nsteps+1, n,n), dtype=complex)
@@ -261,11 +260,11 @@ def run_normal_simulation(n, handler, t_i=0, t_f=1000, h=1e-2):
     #plot_trace_purity(t)
     #plot_diagonal_density_matrix_elements(t)
     #plot_offdiagonal_density_matrix_elements(t)
-    #plot_steady_state_td_2d(t)
+    plot_steady_state_td_2d(t)
     #plot_steady_state_td_3d(t)
     return t
 
-def run_simulation(n, H, L, gamma, t_i=0, t_f=1000, h=1e-2):
+def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2):
     # Setting simulation parameters
 
     system = System(H, L, gamma)
@@ -275,12 +274,11 @@ def run_simulation(n, H, L, gamma, t_i=0, t_f=1000, h=1e-2):
     
     t = solver(t, system.LinEm, h)
 
-    # Plotting
-    #plot_density_matrix_elements(t)
-    plot_trace_purity(t)
+    plot_density_matrix_elements(t)
+    #plot_trace_purity(t)
     #plot_diagonal_density_matrix_elements(t)
     #plot_offdiagonal_density_matrix_elements(t)
     #plot_steady_state_td_2d(t)
-    #plot_steady_state_td_3d(t)
+    plot_steady_state_td_3d(t)
 
     return t

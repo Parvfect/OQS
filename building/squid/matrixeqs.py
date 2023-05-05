@@ -1,5 +1,7 @@
 # Collection of the matrix differential equations for Lrho
 
+# Gamma is in the Lindblad not the LinEm
+
 import numpy as np
 
 def lindblad(L, H):
@@ -24,7 +26,7 @@ class System:
         hamiltonian_part = (-1j)* (np.dot(self.H, x) - np.dot(x, self.H))
         lindblad_part_1 = get_commutator(self.L, np.dot(x, self.Ldag))
         lindblad_part_2 = get_commutator(np.dot(self.L, x), self.Ldag)
-        return hamiltonian_part + 0.5*self.gamma*(lindblad_part_1 + lindblad_part_2)    
+        return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2)    
 
 
 
