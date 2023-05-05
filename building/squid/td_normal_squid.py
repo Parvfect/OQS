@@ -28,8 +28,8 @@ epsilon = w/cutoff # Cutoff frequency
 gamma = 0.05 # Damping Rate
 
 # Operators
-adag = create_annihilation_operator(n) # Annihilation operator
-a = create_creation_operator(n) # Creation operator
+a = create_annihilation_operator(n) # Annihilation operator
+adag = create_creation_operator(n) # Creation operator
 
 Q = (np.sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)) # Momentum operator
 phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to position operator)

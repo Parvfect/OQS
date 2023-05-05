@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
+from matrixeqs import System
 from tqdm import tqdm
 
 pi = np.pi
@@ -16,13 +17,19 @@ def get_anti_commutator(a,b):
 
 """ Operator creation functions """
 
-def create_annihilation_operator(n):
+def create_creation_operator(n):
     """ Create an annihilation operator for the n-th mode """
     return np.matrix(np.diag(np.sqrt(np.arange(1, n)), -1), dtype=complex)
 
-def create_creation_operator(n):
+def create_annihilation_operator(n):
     """ Create a creation operator for the n-th mode """
     return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
+
+def create_position_operator(n):
+    return (create_annihilation_operator(n) + create_creation_operator(n))/2
+
+def create_momentum_operator(n):
+    return (1j)*(create_creation_operator(n) - create_annihilation_operator(n))/2
 
 def get_function_of_operator(f, op):
     """ Return the function of the operator using Sylvester's formula """
@@ -99,6 +106,10 @@ def check_reached_steady_state(rho):
     # Two ways can do firstly change in last two steps is negligible
     # Or I can check if the product of rho and L is zero
     pass
+
+def get_purity_simple(rho):
+    """ Returns the purity of the density matrix """
+    return np.trace(np.dot(rho, rho))
 
 def get_trace(rho):
     return [np.trace(i) for i in rho]
@@ -200,7 +211,7 @@ def plot_trace_purity(rho, title="", pureness=False):
     
     plt.plot(get_trace(rho), label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(get_purity(rho), label = r'$\mathrm{Tr}[\rho^2]$')
-    plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Decoherence}$')
+    #plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Decoherence}$')
     
     plt.legend()
     plt.title("Trace, Purity of Density Matrix {}".format(title))
@@ -238,19 +249,38 @@ def plot_steady_state_td_3d(t):
 
 """ Simulation functions  - to be converted to main command centre """
 
-def run_simulation(n, handler, t_i=0, t_f=1000, h=1e-2):
-    # Setting simulation parameters
+def run_normal_simulation(n, handler, t_i=0, t_f=1000, h=1e-2):
     
     nsteps = int((t_f-t_i)/h)
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
-    
     t = solver(t, handler, h)
 
     # Plotting
     plot_density_matrix_elements(t)
+    #plot_trace_purity(t)
+    #plot_diagonal_density_matrix_elements(t)
+    #plot_offdiagonal_density_matrix_elements(t)
+    #plot_steady_state_td_2d(t)
+    #plot_steady_state_td_3d(t)
+    return t
+
+def run_simulation(n, H, L, gamma, t_i=0, t_f=1000, h=1e-2):
+    # Setting simulation parameters
+
+    system = System(H, L, gamma)
+    nsteps = int((t_f-t_i)/h)
+    t = np.zeros((nsteps+1, n,n), dtype=complex)
+    t[0] = make_initial_density_matrix(n)
+    
+    t = solver(t, system.LinEm, h)
+
+    # Plotting
+    #plot_density_matrix_elements(t)
     plot_trace_purity(t)
-    plot_diagonal_density_matrix_elements(t)
-    plot_offdiagonal_density_matrix_elements(t)
-    plot_steady_state_td_2d(t)
-    plot_steady_state_td_3d(t)
+    #plot_diagonal_density_matrix_elements(t)
+    #plot_offdiagonal_density_matrix_elements(t)
+    #plot_steady_state_td_2d(t)
+    #plot_steady_state_td_3d(t)
+
+    return t
