@@ -57,12 +57,8 @@ def create_cos_phi(phi, phi_o, phi_x, alpha):
     """
     Create a cos(phi) operator for the n-th mode   
     """
-    cos_const = np.cos((2*pi)*(phi_x/phi_o))
-    sin_const = np.sin((2*pi)*(phi_x/phi_o))
-    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*(phi + phi_x))
-    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*(phi + phi_x))
-    return cos_phi - sin_phi 
-
+    return get_function_of_operator(lambda x: np.cos(x), phi)
+    
 def create_sin_phi(phi, phi_o, phi_x, alpha):
     """
     Create a sin(phi) operator for the n-th mode     
@@ -142,10 +138,13 @@ def RK4step(x, h, f):
 
     return x+(h/6)*(k1+2*k2+2*k3+k4)
 
-def solver(sol_arr, f, h):
+def solver(sol_arr, f, h, plot_intervals=False):
 
     for i in tqdm(range(1, sol_arr.shape[0])):
         sol_arr[i] = RK4step(sol_arr[i-1], h, f)
+        if plot_intervals:
+            if i%20 == 0:
+                plot_steady_state_td_3d(sol_arr)
 
     return sol_arr
 
@@ -153,6 +152,16 @@ def steady_state_solver(L):
     """ Solving AX = 0 for the steady state of the system, minimum solution"""
     return Matrix(L).nullspace()[0]
 
+
+def null_space(A, rcond=None):
+    u, s, vh = np.linalg.svd(A, full_matrices=True)
+    M, N = u.shape[0], vh.shape[1]
+    if rcond is None:
+        rcond = np.finfo(s.dtype).eps * max(M, N)
+    tol = np.amax(s) * rcond
+    num = np.sum(s > tol, dtype=int)
+    Q = vh[num:,:].T.conj()
+    return Q
 """ Plotting functions """
 
 def plot_diagonal_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):

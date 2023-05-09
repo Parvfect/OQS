@@ -3,7 +3,7 @@
 from helper_functions import *
 
 # Hilbert Space Dimensions
-n = 10
+n = 5
 
 # Constants
 pi = np.pi
@@ -49,7 +49,7 @@ def first_order_equation():
 L = first_order_equation()
 
 if __name__ == "__main__":
-    print(steady_state_solver(L))
+    sol = null_space(L)
     print("Solution obtained for n = ", n)
     sol = sol.reshape(n,n)
     print(sol)
