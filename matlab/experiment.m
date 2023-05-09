@@ -1,6 +1,6 @@
 
 % Hilbert Space Dimensions
-n = 14;
+n = 6;
 
 % Constants
 pi = 3.14;
@@ -23,8 +23,8 @@ a = create_annihilation_operator(n);
 adag = create_creation_operator(n);
 
 
-Q = (sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)); % Momentum operator;
-phi = (sqrt((hbar)/(2*C*w))*((adag + a))); % Flux operator (analogous to position operator);
+Q =(1j)* (adag - a); % Momentum operator;
+phi = (adag + a); % Flux operator (analogous to position operator);
 
 
 % Dimensionless position and momentum operators
@@ -33,13 +33,14 @@ P = sqrt((1)/(C*w*hbar)) * Q;
 %cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha);
 
 % Defining Hamiltonian and Lindbladian
-H =  (X.*X + P.*P + (gamma/2)*get_commutator(X, P));
-L = gamma^(0.5) * (X + (1j - epsilon/2) * P);
+H =  (Q.*Q + phi.*phi + (gamma/2)*get_commutator(Q, phi)) - cosphi_taylor(phi, n);
+L = gamma^0.5*(phi + 0.1*(1j) * Q);
 Ldag = conj(L).';
 
 
 Lsup = first_order(H, L, Ldag, n);
-%disp(Lsup)
+disp(Lsup)
+
 rho  = steady_soln(Lsup);
 rho = rho(:,1);
 rho = reshape(rho, n, n);
@@ -48,11 +49,24 @@ colorbar
 steady_state_trace = trace(rho)
 steady_state_purity = trace(rho.*rho)
 
+function result = exponential_series(x, n)
+    t=0.0;
+    for i =1:n
+        t += x^i/factorial(i);
+    end
+    result = t;
+end 
+
+function result = cosphi_taylor(phi, n)
+
+    result =  (exponential_series(1j*phi, n) + exponential_series(-1j*phi, n))/2;
+end
+
 function result = first_order(H, L, Ldag, n)
     hamiltonian_part = -(1j) * (kron(H, eye(n)) - kron(eye(n), H));
     lindblad_part_1 = kron(Ldag, L);
     lindblad_part_2 = -0.5*(kron(eye(n), (Ldag.*L)) + kron((Ldag.*L), eye(n)));
-    result =  hamiltonian_part + lindblad_part_1 + lindblad_part_2;
+    result =  hamiltonian_part + (lindblad_part_1 + lindblad_part_2);
 end
 
 function result = steady_soln(L)
