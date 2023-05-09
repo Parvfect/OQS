@@ -45,12 +45,9 @@ if __name__ == "__main__":
     # Simulating
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 2000
-    nsteps = 15000
-
-    h = (t_f-t_i)/nsteps
-
-
+    t_f = 200
+    h = 0.01
+    nsteps = int((t_f-t_i)/h)
     solRK = np.zeros((nsteps+1,n,n),dtype=complex)
     solRK[0]=init
 

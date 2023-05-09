@@ -3,7 +3,7 @@ import numpy as np
 from helper_functions import *
 
 
-n = 14 # Hilbert Space Dimension
+n = 24# Hilbert Space Dimension
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)
@@ -25,14 +25,16 @@ gamma = 0.001
 nth = 1/(np.exp((hbar*w)/(kb*T))-1) #2
 sz = np.array([[1,0],[0,-1]])
 wo = 10
+L = q + 1j*p
+Ldag = np.conj(L.T)
 #H = (wo/2) * sz 
 
 # Encoding Equation
 def LinEm():
-    res = -1j* (np.kron(np.eye(n), H) - np.kron(H.T, np.eye(n)))
-    #res += gamma* (nth+1) * (np.kron(a.T, adag) - 0.5*(np.kron(np.eye(n), np.dot(a, adag)) + np.kron(np.dot(a, adag).T, np.eye(n))))
-    res += gamma* (nth) * (np.kron(adag.T, a) - 0.5*(np.kron(np.eye(n), np.dot(adag, a)) + np.kron(np.dot(adag, a).T, np.eye(n))))
-    return res
+    hamiltonian_part = -(1j) * (np.kron(H, np.identity(n)) - np.kron(np.identity(n), H)) 
+    lindblad_part_1 = np.kron(Ldag, L) 
+    lindblad_part_2 = -0.5*(np.kron(np.identity(n), np.dot(Ldag, L)) + np.kron(np.dot(Ldag, L), np.identity(n)))
+    return hamiltonian_part + lindblad_part_1 + lindblad_part_2
 
 L = LinEm()
 
@@ -40,20 +42,7 @@ def handler(rho):
     return (np.dot(L, rho.flatten("F"))).reshape(n,n).T
 
 if __name__ == "__main__":
-    # Simulating
-    init = make_initial_density_matrix(n)
-    t_i = 0
-    t_f = 2000
-    nsteps = 10000
-
-    h = (t_f-t_i)/nsteps
-
-
-    solRK = np.zeros((nsteps+1,n,n),dtype=complex)
-    solRK[0]=init
-
-    solver(solRK, handler, h)
-
-    # Visualising
-    plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
-    plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
+    steady_state = steady_state_solver(L)
+    print(steady_state[0])
+    #plt.imshow(steady_state[0])
+    #plt.show()

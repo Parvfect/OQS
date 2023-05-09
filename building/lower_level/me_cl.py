@@ -1,12 +1,9 @@
 
-
-# Needs fixing
-
 import numpy as np
 from helper_functions import *
 
 n = 10 # Hilbert Space Dimension
-gamma = 0.5 # Damping Rate
+gamma = 0.05 # Damping Rate
 
 # Annihilation and Creation Operators
 adag = create_annihilation_operator(n)
@@ -34,8 +31,8 @@ def LinEm(x):
 if __name__ == "__main__":
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 20
-    h = 0.001
+    t_f = 200
+    h = 0.01
     nsteps = int((t_f-t_i)/h)
     solRK = np.zeros((nsteps+1,n, n),dtype=complex)
     solRK[0]=init

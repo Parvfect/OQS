@@ -1,28 +1,25 @@
 
-# Needs fixing
-
 import numpy as np
 from helper_functions import *
 
-
-n = 10# Hilbert Space Dimension
-gamma = 0.05# Damping Rate
+n = 10 # Hilbert Space Dimension
+gamma = 0.05 # Damping Rate
 
 # Annihilation and Creation Operators
-adag = create_annihilation_operator(n)
-a = create_creation_operator(n)
+a = create_annihilation_operator(n)
+adag = create_creation_operator(n)
 
 # Hamiltonian
-q = (adag + a)/2
-p = 1j*(adag - a)/2
-H = (np.dot(p,p) + np.dot(q,q)) #+ gamma/2 * get_anti_commutator(q,p)
+q = create_position_operator(n)
+p = create_momentum_operator(n)
+H = (np.dot(p,p) + np.dot(q,q)) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
 
 # Initial Density Matrix
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
-T = 100
+T = 3000
 
 L = q + 1/T*(1j)*p
 Ldag = np.conjugate(L).T
@@ -35,10 +32,29 @@ def LinEm(x):
     return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)    
 
 
+def validate_steady_state():
+    times = np.arange(4, 800, 50)
+    lrho_sum = []
+
+    for t in tqdm(times):
+        t_i = 0
+        t_f = t
+        h = 1e-2
+        nsteps = int((t_f-t_i)/h)
+        sol = np.zeros((nsteps+1, n,n), dtype=complex)
+        sol[0] = make_initial_density_matrix(n)
+        
+        sol = solver(sol, LinEm, h)
+        lrho_sum.append(np.sum(np.dot(np.kron(L, np.eye(n)), sol[-1].reshape(n*n, 1))))
+
+    plt.plot(times, lrho_sum)
+    plt.show()
+
 if __name__ == "__main__":
+    
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 800
+    t_f = 400
     h = 0.01
     nsteps = int((t_f-t_i)/h)
 
@@ -47,14 +63,13 @@ if __name__ == "__main__":
     solRK[0]=init
 
     # Solving
-    solRK = solver(solRK, LinEm, h)
+    solRK = solver(solRK, LinEm, h, plot_intervals=True)
 
     # Visualising
     plot_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
-    #plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
+    plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
     #plot_diagonal_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
     #plot_offdiagonal_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
-    plot_trace_purity(solRK, title="CL Model at {} Temperature".format("Low"))
-    wigner_plot_steady_state(solRK)
-    plot_steady_state_td(solRK, title="CL Model at {} Temperature".format("Low"))
-    print("Steady state purity is {}".format(np.trace(np.dot(solRK[-1], solRK[-1]))))
+    plot_steady_state_td_2d(solRK, title="CL Model at {} Temperature".format("Low"))
+    plot_steady_state_td_3d(solRK)
+    

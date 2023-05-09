@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Matrix
+from matrixeqs import System
 from tqdm import tqdm
 
 pi = np.pi
@@ -16,13 +17,19 @@ def get_anti_commutator(a,b):
 
 """ Operator creation functions """
 
-def create_annihilation_operator(n):
+def create_creation_operator(n):
     """ Create an annihilation operator for the n-th mode """
     return np.matrix(np.diag(np.sqrt(np.arange(1, n)), -1), dtype=complex)
 
-def create_creation_operator(n):
+def create_annihilation_operator(n):
     """ Create a creation operator for the n-th mode """
     return np.matrix(np.diag(np.sqrt(np.arange(1, n)), 1), dtype=complex)
+
+def create_position_operator(n):
+    return (create_annihilation_operator(n) + create_creation_operator(n))/np.sqrt(2)
+
+def create_momentum_operator(n):
+    return (1j)*(create_creation_operator(n) - create_annihilation_operator(n))/np.sqrt(2)
 
 def get_function_of_operator(f, op):
     """ Return the function of the operator using Sylvester's formula """
@@ -50,12 +57,8 @@ def create_cos_phi(phi, phi_o, phi_x, alpha):
     """
     Create a cos(phi) operator for the n-th mode   
     """
-    cos_const = np.cos((2*pi)*(phi_x/phi_o))
-    sin_const = np.sin((2*pi)*(phi_x/phi_o))
-    cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*(phi + phi_x))
-    sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*(phi + phi_x))
-    return cos_phi - sin_phi 
-
+    return get_function_of_operator(lambda x: np.cos(x), phi)
+    
 def create_sin_phi(phi, phi_o, phi_x, alpha):
     """
     Create a sin(phi) operator for the n-th mode     
@@ -65,6 +68,39 @@ def create_sin_phi(phi, phi_o, phi_x, alpha):
     cos_phi = get_function_of_operator(lambda x: np.cos(x), alpha*phi)
     sin_phi = get_function_of_operator(lambda x: np.sin(x), alpha*phi)
     return cos_const*cos_phi + sin_const*sin_phi
+
+def validate_steady_state(handler, Lrho, n):
+    """ Validates whether the steady state is correct by checking if Lrho approaches 0 """
+
+    times = np.arange(4, 500, 50)
+    lrho_sum = []
+    for t in tqdm(times):
+        t_i = 0
+        t_f = t
+        h = 1e-2
+        nsteps = int((t_f-t_i)/h)
+        sol = np.zeros((nsteps+1, n,n), dtype=complex)
+        sol[0] = make_initial_density_matrix(n)
+        
+        sol = solver(sol, handler, h)
+        lrho_sum.append(np.sum(np.dot(Lrho, sol[-1].reshape(n*n, 1))))
+
+    plt.plot(times, lrho_sum)
+    plt.title("Steady State Validation, sum(Lrho) vs Length of Simulation")
+    plt.ylabel("sum(Lrho) = dp/dt")
+    plt.xlabel("Length of Simulation")
+    plt.show()
+
+def create_phi(n):
+    return create_annihilation_operator(n) + create_creation_operator(n)
+
+def exponential_series(x, n):
+    """ Returns the exponential series of x to the n-th term for matrices"""
+    return np.sum([np.linalg.matrix_power(x, i)/np.math.factorial(i) for i in range(0,n)], axis=0)
+
+def cosphi_taylor(phi, n):
+
+    return (exponential_series(1j*phi, n) + exponential_series(-1j*phi, n))/2
 
 """ Miscallaneous functions """
 
@@ -76,6 +112,10 @@ def check_reached_steady_state(rho):
     # Two ways can do firstly change in last two steps is negligible
     # Or I can check if the product of rho and L is zero
     pass
+
+def get_purity_simple(rho):
+    """ Returns the purity of the density matrix """
+    return np.trace(np.dot(rho, rho))
 
 def get_trace(rho):
     return [np.trace(i) for i in rho]
@@ -98,10 +138,13 @@ def RK4step(x, h, f):
 
     return x+(h/6)*(k1+2*k2+2*k3+k4)
 
-def solver(sol_arr, f, h):
+def solver(sol_arr, f, h, plot_intervals=False):
 
     for i in tqdm(range(1, sol_arr.shape[0])):
         sol_arr[i] = RK4step(sol_arr[i-1], h, f)
+        if plot_intervals:
+            if i%20 == 0:
+                plot_steady_state_td_3d(sol_arr)
 
     return sol_arr
 
@@ -109,6 +152,16 @@ def steady_state_solver(L):
     """ Solving AX = 0 for the steady state of the system, minimum solution"""
     return Matrix(L).nullspace()[0]
 
+
+def null_space(A, rcond=None):
+    u, s, vh = np.linalg.svd(A, full_matrices=True)
+    M, N = u.shape[0], vh.shape[1]
+    if rcond is None:
+        rcond = np.finfo(s.dtype).eps * max(M, N)
+    tol = np.amax(s) * rcond
+    num = np.sum(s > tol, dtype=int)
+    Q = vh[num:,:].T.conj()
+    return Q
 """ Plotting functions """
 
 def plot_diagonal_density_matrix_elements(rho, ti=0, title="", show=True, trace_purity=True):
@@ -166,7 +219,7 @@ def plot_trace_purity(rho, title="", pureness=False):
     
     plt.plot(get_trace(rho), label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(get_purity(rho), label = r'$\mathrm{Tr}[\rho^2]$')
-    plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Decoherence}$')
+    #plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Decoherence}$')
     
     plt.legend()
     plt.title("Trace, Purity of Density Matrix {}".format(title))
@@ -201,3 +254,40 @@ def plot_steady_state_td_3d(t):
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
     return
+
+""" Simulation functions  - to be converted to main command centre """
+
+def run_normal_simulation(n, handler, t_i=0, t_f=200, h=1e-2):
+    
+    nsteps = int((t_f-t_i)/h)
+    t = np.zeros((nsteps+1, n,n), dtype=complex)
+    t[0] = make_initial_density_matrix(n)
+    t = solver(t, handler, h)
+
+    # Plotting
+    plot_density_matrix_elements(t)
+    #plot_trace_purity(t)
+    #plot_diagonal_density_matrix_elements(t)
+    #plot_offdiagonal_density_matrix_elements(t)
+    plot_steady_state_td_2d(t)
+    #plot_steady_state_td_3d(t)
+    return t
+
+def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2):
+    # Setting simulation parameters
+
+    system = System(H, L, gamma)
+    nsteps = int((t_f-t_i)/h)
+    t = np.zeros((nsteps+1, n,n), dtype=complex)
+    t[0] = make_initial_density_matrix(n)
+    
+    t = solver(t, system.LinEm, h)
+
+    plot_density_matrix_elements(t)
+    #plot_trace_purity(t)
+    #plot_diagonal_density_matrix_elements(t)
+    #plot_offdiagonal_density_matrix_elements(t)
+    #plot_steady_state_td_2d(t)
+    plot_steady_state_td_3d(t)
+
+    return t
