@@ -287,7 +287,7 @@ def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2):
     #plot_trace_purity(t)
     #plot_diagonal_density_matrix_elements(t)
     #plot_offdiagonal_density_matrix_elements(t)
-    #plot_steady_state_td_2d(t)
+    plot_steady_state_td_2d(t)
     plot_steady_state_td_3d(t)
 
     return t

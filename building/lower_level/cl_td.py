@@ -2,7 +2,7 @@
 import numpy as np
 from helper_functions import *
 
-n = 10 # Hilbert Space Dimension
+n = 14 # Hilbert Space Dimension
 gamma = 0.05 # Damping Rate
 
 # Annihilation and Creation Operators
@@ -19,9 +19,9 @@ H = np.array(H)
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
-T = 3000
+T = 100
 
-L = q + 1/T*(1j)*p
+L = np.sqrt(T)*q + np.sqrt(1/T)*(1j)*p
 Ldag = np.conjugate(L).T
 
 def LinEm(x):
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     solRK[0]=init
 
     # Solving
-    solRK = solver(solRK, LinEm, h, plot_intervals=True)
+    solRK = solver(solRK, LinEm, h)
 
     # Visualising
     plot_density_matrix_elements(solRK, title="CL Model at {} Temperature".format("Low"))
