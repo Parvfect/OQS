@@ -28,7 +28,7 @@ def LinEm(x):
     what = -1j*gamma* get_commutator(p, get_anti_commutator(q,x))
 
     #return hamiltonian_part + 0.01*second_kernel + 0.01*third_kernel + 10*added_term
-    return hamiltonian_part + 2*added_term
+    return hamiltonian_part + 2 *added_term
 
 if __name__ == "__main__":
     init = make_initial_density_matrix(n)

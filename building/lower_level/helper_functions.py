@@ -72,7 +72,7 @@ def create_sin_phi(phi, phi_o, phi_x, alpha):
 def validate_steady_state(handler, Lrho, n):
     """ Validates whether the steady state is correct by checking if Lrho approaches 0 """
 
-    times = np.arange(4, 500, 50)
+    times = np.arange(1000, 10000, 1000)
     lrho_sum = []
     for t in tqdm(times):
         t_i = 0
@@ -126,6 +126,10 @@ def get_purity(rho):
 def measure_pureness_state(rho):
     """ Sum of off diagonal elements of matrix """
     return (np.sum(rho) - np.sum(np.diag(rho)))
+
+def get_linear_entropy(rho):
+    """ Returns the linear entropy of the density matrix """
+    return [1 - np.trace(np.dot(i, i)) for i in rho]
 
 """ RK4 solver """
 
@@ -219,7 +223,7 @@ def plot_trace_purity(rho, title="", pureness=False):
     
     plt.plot(get_trace(rho), label = r'$\mathrm{Tr}[\rho]$')
     plt.plot(get_purity(rho), label = r'$\mathrm{Tr}[\rho^2]$')
-    #plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Decoherence}$')
+    plt.plot([1 - i for i in get_purity(rho)], label = r'$\mathrm{Linear Entropy}$')
     
     plt.legend()
     plt.title("Trace, Purity of Density Matrix {}".format(title))
@@ -273,7 +277,7 @@ def run_normal_simulation(n, handler, t_i=0, t_f=200, h=1e-2):
     #plot_steady_state_td_3d(t)
     return t
 
-def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2, title=""):
+def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2, title="", plotting=True):
     # Setting simulation parameters
 
     system = System(H, L, gamma)
@@ -283,11 +287,12 @@ def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2, title=""):
     
     t = solver(t, system.LinEm, h)
 
-    #plot_density_matrix_elements(t, title=title)
-    #plot_trace_purity(t, title=title)
-    #plot_diagonal_density_matrix_elements(t, title=title)
-    #plot_offdiagonal_density_matrix_elements(t, title=title)
-    #plot_steady_state_td_2d(t, title=title)
-    plot_steady_state_td_3d(t, title=title)
+    if plotting:
+        plot_density_matrix_elements(t, title=title)
+        plot_trace_purity(t, title=title)
+        plot_diagonal_density_matrix_elements(t, title=title)
+        plot_offdiagonal_density_matrix_elements(t, title=title)
+        plot_steady_state_td_2d(t, title=title)
+        plot_steady_state_td_3d(t, title=title)
 
     return t

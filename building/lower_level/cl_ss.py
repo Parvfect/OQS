@@ -6,26 +6,26 @@
 from helper_functions import *
 
 # Hilbert Space Dimensions
-n = 40
-gamma = 0.05 # Damping Rate
+n = 14
+gamma = 0.5 # Damping Rate
 
 # Operators
-adag = create_annihilation_operator(n) # Annihilation operator
-a = create_creation_operator(n) # Creation operator
+a = create_annihilation_operator(n)
+adag = create_creation_operator(n)
 
 # Hamiltonian
-q = (adag + a)/2
-p = 1j*(adag - a)/2
+q = create_position_operator(n)
+p = create_momentum_operator(n)
 H = (np.dot(p,p) + np.dot(q,q)) + gamma/2 * get_anti_commutator(q,p)
 H = np.array(H)
 
 # Initial Density Matrix
-w = 2e13
+w = 2e13    
 hbar = 1e-34
 kb = 1.38e-23
 T = 1
 
-L = q + (1/T)*(1j)*p
+L = 0.1*a 
 Ldag = np.conjugate(L).T
 
 def first_order_equation():
@@ -36,9 +36,6 @@ def first_order_equation():
     return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)
 
 L = first_order_equation()
-plt.imshow(L.real)
-plt.colorbar()
-plt.show()
 
 if __name__ == "__main__":
     

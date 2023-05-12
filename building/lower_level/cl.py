@@ -2,6 +2,10 @@
 
 from helper_functions import *
 import numpy as np
+from matrixeqs import System
+
+n = 14
+
 
 def low_temperature_hal(n, gamma = 0.05, w=3, cutoff=200):
     q = create_position_operator(n)
@@ -53,50 +57,41 @@ def frequency_analysis(n):
     plt.grid()
     plt.show()
 
+def first_order_equation(H, L, n, Ldag):
+    hamiltonian_part = -(1j) * (np.kron(H, np.identity(n)) - np.kron(np.identity(n), H)) 
+    lindblad_part_1 = np.kron(Ldag, L) 
+    lindblad_part_2 = -0.5*(np.kron(np.identity(n), np.dot(Ldag, L)) + np.kron(np.dot(Ldag, L), np.identity(n)))
+    return hamiltonian_part + 0.5*gamma*(lindblad_part_1 + lindblad_part_2)
+
+def compare_entropy(factor = 1e-3):
+
+    Ls = [factor*i for i in  [a, np.dot(a,a), np.dot(a, np.dot(a,a)), np.dot(a, np.dot(a, np.dot(a,a))), np.dot(a, np.dot(a, np.dot(a, np.dot(a,a))))]]
+    labels = ["a", "a^2", "a^3", "a^4", "a^5"]
+
+    for i in range(len(Ls)):
+        L = Ls[i]
+        solRK = run_simulation(n, H, L, gamma, t_f=10000, h=0.1, plotting=False)
+        linear_entropy = get_linear_entropy(solRK)
+        plt.plot(linear_entropy, label=labels[i])
+    
+    plt.title("Linear Entropy vs Time for the Caldeira-Leggett Model")
+    plt.xlabel("Time")
+    plt.ylabel("Linear Entropy")
+    plt.legend()
+    plt.grid()
+    plt.show()
+    return
+
 if __name__ == "__main__":
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=10, title="CL model")
+    n = 14
+    q = create_position_operator(n)
+    p = create_momentum_operator(n)
+    gamma = 0.5
+    H = (np.dot(p,p) + np.dot(q,q) + gamma/2 * get_anti_commutator(q,p))
+    a = create_annihilation_operator(n)
+    adag = create_creation_operator(n)
+    L = 1e-3*(np.dot(a,a))
     
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=11, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=12, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=13, title="CL model")
     
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=14, title="CL model")
-    
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=15, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=16, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=17, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=18, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=19, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=20, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=21, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=22, title="CL model")
-    n = 20
-    H, L, gamma = high_temperature_hal(n, T = 1000)
-    solRK = run_simulation(n, H, L, gamma, t_f=23, title="CL model")
-    
+    #solRK1 = run_simulation(n, H, L, gamma, t_f=2000, h=0.1, plotting=True)
+    compare_entropy()
