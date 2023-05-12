@@ -2,7 +2,7 @@
 import numpy as np
 from helper_functions import *
 
-n = 10 # Hilbert Space Dimension
+n = 14 # Hilbert Space Dimension
 gamma = 0.05 # Damping Rate
 
 # Annihilation and Creation Operators
@@ -25,9 +25,10 @@ def LinEm(x):
     second_kernel = - 1j * gamma * get_commutator(q, get_anti_commutator(p, x))
     third_kernel = - gamma * T * get_commutator(q, get_commutator(q,x))
     added_term = - gamma /T * get_commutator(p, get_commutator(p,x))
+    what = -1j*gamma* get_commutator(p, get_anti_commutator(q,x))
 
     #return hamiltonian_part + 0.01*second_kernel + 0.01*third_kernel + 10*added_term
-    return hamiltonian_part + third_kernel
+    return hamiltonian_part + 2*added_term
 
 if __name__ == "__main__":
     init = make_initial_density_matrix(n)
@@ -42,12 +43,12 @@ if __name__ == "__main__":
     solRK = solver(solRK, LinEm, h)
 
     # Visualising
-    plot_density_matrix_elements(solRK, title="QHO Thermal Bath with {}states".format(n))
-    plot_trace_purity(solRK, title="QHO Thermal Bath with {}states".format(n))
-    plot_diagonal_density_matrix_elements(solRK)
-    plot_offdiagonal_density_matrix_elements(solRK)
-    plot_steady_state_td_2d(solRK)
-    plot_steady_state_td_3d(solRK)
+    plot_density_matrix_elements(solRK)
+    #plot_trace_purity(solRK)
+    #plot_diagonal_density_matrix_elements(solRK)
+    #plot_offdiagonal_density_matrix_elements(solRK)
+    #plot_steady_state_td_2d(solRK)
+    #plot_steady_state_td_3d(solRK)
 
    # plot_steady_state_td(solRK, title="Calderia Leggett with {}states".format(n))
     

@@ -19,7 +19,7 @@ H = np.array(H)
 w = 2e13
 hbar = 1e-34
 kb = 1.38e-23
-T = 100
+T = 1000
 
 L = np.sqrt(T)*q + np.sqrt(1/T)*(1j)*p
 Ldag = np.conjugate(L).T
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     
     init = make_initial_density_matrix(n)
     t_i = 0
-    t_f = 400
+    t_f = 600
     h = 0.01
     nsteps = int((t_f-t_i)/h)
 
