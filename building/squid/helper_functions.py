@@ -98,10 +98,13 @@ def exponential_series(x, n):
     """ Returns the exponential series of x to the n-th term for matrices"""
     return np.sum([np.linalg.matrix_power(x, i)/np.math.factorial(i) for i in range(0,n)], axis=0)
 
-def cosphi_taylor(phi, n):
+def cosphi_taylor(phi, n=20):
 
     return (exponential_series(1j*phi, n) + exponential_series(-1j*phi, n))/2
 
+def sinphi_taylor(phi, n=20):
+        return (exponential_series(1j*phi, n) - exponential_series(-1j*phi, n))/(2j)
+        
 """ Miscallaneous functions """
 
 def make_initial_density_matrix(n):
@@ -237,7 +240,7 @@ def plot_steady_state_td_2d(rho, title=""):
     plt.show()
     return
 
-def plot_steady_state_td_3d(t):
+def plot_steady_state_td_3d(t, title=""):
     """ Surface plot for Steady State Density Matrix obtained through time evolution """
     
     steady_state = t[-1]
@@ -250,7 +253,7 @@ def plot_steady_state_td_3d(t):
     ax = fig.add_subplot(projection='3d')
     surf = ax.plot_surface(X, Y, steady_state, rstride=1, cstride=1, cmap='hot', linewidth=0, antialiased=False)
     ax.set_zlim(-1.01, 1.01)
-    plt.title("Steady State Density Matrix")
+    plt.title("Steady State Density Matrix {}".format(title))
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
     return
@@ -273,7 +276,7 @@ def run_normal_simulation(n, handler, t_i=0, t_f=200, h=1e-2):
     #plot_steady_state_td_3d(t)
     return t
 
-def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2):
+def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2, title=""):
     # Setting simulation parameters
 
     system = System(H, L, gamma)
@@ -283,11 +286,11 @@ def run_simulation(n, H, L, gamma, t_i=0, t_f=300, h=1e-2):
     
     t = solver(t, system.LinEm, h)
 
-    plot_density_matrix_elements(t)
-    #plot_trace_purity(t)
-    #plot_diagonal_density_matrix_elements(t)
-    #plot_offdiagonal_density_matrix_elements(t)
-    #plot_steady_state_td_2d(t)
-    plot_steady_state_td_3d(t)
+    plot_density_matrix_elements(t, title=title)
+    plot_trace_purity(t, title=title)
+    #plot_diagonal_density_matrix_elements(t, title=title)
+    #plot_offdiagonal_density_matrix_elements(t, title=title)
+    plot_steady_state_td_2d(t, title=title)
+    plot_steady_state_td_3d(t, title=title)
 
     return t

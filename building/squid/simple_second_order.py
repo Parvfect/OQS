@@ -1,4 +1,5 @@
 
+
 from helper_functions import *
 
 
@@ -15,12 +16,13 @@ w = 8.16e11
 e = 1.6e-19
 phi_o = hbar/(2*e)
 phi_x = 0.5* phi_o
+flux_ratio = 0.5
 mu = je/hbar
 alpha = np.sqrt((4 * pi*pi * hbar)/(phi_o*phi_o*C))
 muomega = mu/w # 
 cutoff = 20 * w
 epsilon = w/cutoff # Cutoff frequency
-gamma = 0.001 # Damping Rate
+gamma = 0.05 # Damping Rate
 
 Ic = 2*pi*hbar*mu/phi_o
 beta = 2*pi * l*Ic//phi_o
@@ -36,13 +38,18 @@ phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to posit
 # Dimensionless position and momentum operators
 X = np.sqrt((C*w)/hbar) * phi
 P = np.sqrt((1)/(C*w*hbar)) * Q
-cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
+cphi = cosphi_taylor(X, 20)
 
-H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P) + np.sqrt(beta*epsilon*,u/omega) 
+X = create_position_operator(n)
+P = create_momentum_operator(n)
+cphi = cosphi_taylor(X, 20)
 
+H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (gamma/2)*get_anti_commutator(X, P) + gamma* np.sqrt(beta*epsilon*mu/w) * sinphi_taylor(X, 20) 
 
-L_1 = gamma**(0.5) * (np.sqrt((1- epsilon)* (1 - epsilon**2))* X + (1j - epsilon/2)*(np.sqrt(1/((1- epsilon)* (1 - epsilon**2)))) * P)  
-L_2 = gamma**(0.5) * (np.sqrt((epsilon)* (1 - epsilon**2))* X + (np.sqrt(epsilon/(1 - epsilon**2)))*(1j - epsilon/2)* (beta*mu/w) * create_sin_phi(X, phi_o, phi_x, sinphi_const))
+L_1 = gamma**(0.5) * (X + (1j) * P)  
+
+L_2 = gamma**(0.5) * (X + 50*(1j - epsilon/2)* sinphi_taylor(X, 20))
+
 L_1dag = L_1.conj().T
 L_2dag = L_2.conj().T
 
@@ -55,34 +62,14 @@ def handler(x):
   
     return hamiltonian_part + 0.5*(lindblad_part_1 + lindblad_part_2 + lindblad_part_3 + lindblad_part_4)
 
-def run_simulation(phi_x_phi_o_ratio):
-   
-    phi_x = phi_o * phi_x_phi_o_ratio
-    cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
-
-    H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
-    L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
-    Ldag = L.conj().T
-
-    # Setting simulation parameters
-    t_i = 0
-    t_f = 5000
-    nsteps = 20000
-    h = (t_f-t_i)/nsteps
-    t = np.zeros((nsteps+1, n,n), dtype=complex)
-    t[0] = make_initial_density_matrix(n)
-    
-    t = solver(t, handler, h)
-
-    return t
-
 if __name__ == "__main__":
 
     # Setting simulation parameters
     t_i = 0
-    t_f = 800
-    nsteps = 80000
-    h = (t_f-t_i)/nsteps
+    t_f = 200
+    h = 1e-2
+    nsteps = int((t_f - t_i)/h)
+    
     t = np.zeros((nsteps+1, n,n), dtype=complex)
     t[0] = make_initial_density_matrix(n)
     
@@ -94,6 +81,6 @@ if __name__ == "__main__":
     plot_trace_purity(t)
 
     # Plotting the steady state
-    plot_steady_state_td(t, title=f"{n} state SQUID TD simulation steady state")
+    plot_steady_state_td_2d(t, title=f"{n} state SQUID TD simulation steady state")
     
     print("Steady state purity = {}".format(np.abs(np.trace(np.dot(t[-1], t[-1])))))

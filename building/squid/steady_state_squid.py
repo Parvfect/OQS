@@ -3,7 +3,7 @@
 from helper_functions import *
 
 # Hilbert Space Dimensions
-n = 5
+n = 14
 
 # Constants
 pi = np.pi
@@ -23,19 +23,19 @@ epsilon = w/cutoff # Cutoff frequency
 gamma = 0.05 # Damping Rate
 
 # Operators
-adag = create_annihilation_operator(n) # Annihilation operator
-a = create_creation_operator(n) # Creation operator
+a = create_annihilation_operator(n)
+adag = create_creation_operator(n)
 
-Q = (np.sqrt((hbar*C*w)/(2)) * (1j)* (adag - a)) # Momentum operator
-phi = (np.sqrt((hbar)/(2*C*w))*((adag + a))) # Flux operator (analogous to position operator)
+Q = (np.sqrt(hbar*C*w)) * create_momentum_operator(n) # Momentum operator
+phi = (np.sqrt((hbar)/(C*w))*create_position_operator(n)) # Flux operator (analogous to position operator)
 
 # Dimensionless position and momentum operators
 X = np.sqrt((C*w)/hbar) * phi
 P = np.sqrt((1)/(C*w*hbar)) * Q
-cphi = muomega * create_cos_phi(X, phi_o, phi_x, alpha)
+cphi = cosphi_taylor(X-0.3, 20)
 
 H =  (np.dot(X, X) + np.dot(P, P) - cphi) + (hbar*gamma/2)*get_commutator(X, P)
-L = gamma**(0.5) * (X + (1j - epsilon/2) * P)
+L = gamma**(0.5) * (1e-8*a )
 Ldag = L.conj().T
 
 
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     #plt.imshow(sol, interpolation='nearest')
     #print(type(sol))
     plt.imshow(np.array(sol).astype(np.float64))
+    plt.colorbar()
     plt.title("Steady State Density Matrix, n = " + str(n))
     plt.show()
     trace = np.trace(sol)
