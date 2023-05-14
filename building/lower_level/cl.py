@@ -65,14 +65,19 @@ def first_order_equation(H, L, n, Ldag):
 
 def compare_entropy(factor = 1e-3):
 
-    Ls = [factor*i for i in  [a, np.dot(a,a), np.dot(a, np.dot(a,a)), np.dot(a, np.dot(a, np.dot(a,a))), np.dot(a, np.dot(a, np.dot(a, np.dot(a,a))))]]
-    labels = ["a", "a^2", "a^3", "a^4", "a^5"]
+    a = create_annihilation_operator(n)
+    adag = create_creation_operator(n)
+    Ls = [a, np.dot(a,a), a+adag, a-adag, np.dot(a,a)-np.dot(adag,adag)]
+    Ls = 0.001*np.array(Ls)
+    labels = ["a", "a^2", "a+a^dag", "a-a^dag", "a^2-a^dag^2"]
+    ssps = []
 
     for i in range(len(Ls)):
         L = Ls[i]
-        solRK = run_simulation(n, H, L, gamma, t_f=10000, h=0.1, plotting=False)
+        solRK = run_simulation(n, H, L, gamma, t_f=5000, h=0.1, plotting=False)
         linear_entropy = get_linear_entropy(solRK)
         plt.plot(linear_entropy, label=labels[i])
+        ssps.append([np.trace(np.dot(solRK[-1], solRK[-1]))])
     
     plt.title("Linear Entropy vs Time for the Caldeira-Leggett Model")
     plt.xlabel("Time")
@@ -80,6 +85,14 @@ def compare_entropy(factor = 1e-3):
     plt.legend()
     plt.grid()
     plt.show()
+
+    plt.plot(labels, ssps, "o")
+    plt.title("Steady State Purity vs L for the Caldeira-Leggett Model")
+    plt.xlabel("L")
+    plt.ylabel("Steady State Purity")
+    plt.grid()
+    plt.show()
+
     return
 
 if __name__ == "__main__":
@@ -91,7 +104,7 @@ if __name__ == "__main__":
     a = create_annihilation_operator(n)
     adag = create_creation_operator(n)
     L = 1e-3*(np.dot(a,a))
+     
     
-    
-    #solRK1 = run_simulation(n, H, L, gamma, t_f=2000, h=0.1, plotting=True)
+    solRK1 = run_simulation(n, H, L, gamma, t_f=5000, h=0.1, plotting=True)
     compare_entropy()

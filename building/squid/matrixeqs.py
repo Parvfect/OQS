@@ -12,7 +12,7 @@ def lindblad(L, H):
     return hamiltonian_part + lindblad_part_1 + lindblad_part_2
 
 def get_commutator(a,b):
-    return np.dot(a,b) - np.dot(b,a)
+    return np.matmul(a,b) - np.matmul(b,a)
 
 
 class System:
